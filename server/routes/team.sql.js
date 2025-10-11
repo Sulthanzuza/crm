@@ -4,7 +4,12 @@ const { body, validationResult } = require('express-validator');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
 const Member = require('../models/Member');
 const { notifyUserCreated} = require('../utils/emailService')
+const Lead = require('../models/Lead');
+const Quote = require('../models/Quote'); // Assuming you have this model
+const Invoice = require('../models/Invoices');
+const { Op,fn,col } = require('sequelize');
 const router = express.Router();
+
 
 
 router.post(
@@ -58,12 +63,111 @@ await notifyUserCreated(created, password);
     }
   }
 );
+function getDateRange(range) {
+  const now = new Date();
+  let start, end;
+  switch (range) {
+    case 'month':
+      start = new Date(now.getFullYear(), now.getMonth(), 1);
+      end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      break;
+    case 'last_month':
+      start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      end = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+    case 'quarter':
+      start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      break;
+    default:
+      start = new Date(0);
+      end = now;
+  }
+  return { start, end };
+}
+router.get('/users/:id/performance', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const requesterId = req.subjectId;
+    const range = req.query.range || 'month';
+
+    if (!isAdmin(req) && requesterId !== userId) {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
+    const { start, end } = getDateRange(range);
+
+    // No 'amount' field in leads model, so only count by stage
+    const leadStagesSummary = await Lead.findAll({
+      attributes: [
+        'stage',
+        [fn('COUNT', col('id')), 'count'],
+      ],
+      where: {
+        salesmanId: userId,
+        createdAt: { [Op.between]: [start, end] }
+      },
+      group: ['stage'],
+    });
+
+    // Use grandTotal or totalCost field for aggregating amounts in Quotes
+    const quoteStatusSummary = await Quote.findAll({
+      attributes: [
+        'status',
+        [fn('COUNT', col('id')), 'count'],
+        [fn('SUM', col('grandTotal')), 'totalAmount']
+      ],
+      where: {
+        salesmanId: userId,
+        createdAt: { [Op.between]: [start, end] }
+      },
+      group: ['status'],
+    });
+
+    // Use grandTotal or totalAmount field for Invoices
+    const invoiceStatusSummary = await Invoice.findAll({
+      attributes: [
+        'status',
+        [fn('COUNT', col('id')), 'count'],
+        [fn('SUM', col('grandTotal')), 'totalAmount']
+      ],
+      where: {
+        salesmanId: userId,
+        status: 'PAID',
+        createdAt: { [Op.between]: [start, end] }
+      },
+      group: ['status'],
+    });
+
+    const user = await Member.findByPk(userId, {
+      attributes: ['id', 'name', 'email', 'designation','createdAt'],
+    });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.json({
+      success: true,
+      user,
+      leadStagesSummary,
+      quoteStatusSummary,
+      invoiceStatusSummary
+    });
+  } catch (error) {
+    console.error('Performance route error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
 
 router.get('/for-selection', authenticateToken, async (req, res) => {
     try {
         const users = await Member.findAll({
             where: {
                 isBlocked: false, 
+                isDeleted: false,
             },
             attributes: ['id', 'name', 'isBlocked'], // Send only necessary data
             order: [['name', 'ASC']],

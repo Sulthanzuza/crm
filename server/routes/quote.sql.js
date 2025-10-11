@@ -17,7 +17,7 @@ const router = express.Router();
 const {sequelize}=require('../config/database')
 const Counter = require('../models/Counter')
 const ShareGp= require('../models/ShareGp')
-const  { notifyAdminsOfApprovalRequest,notifySharedMemberOnQuoteCreation,  notifyMemberOfQuoteDecision, notifyAdminsOfSuccess }= require('../utils/emailService')
+const  { notifyAdminsOfApprovalRequest,notifySharedMemberOnQuoteCreation,notifyAllRelevantParties,  notifyMemberOfQuoteDecision, notifyAdminsOfSuccess }= require('../utils/emailService')
 // --- Constants ---
 const APPROVAL_LIMIT = 500; // Quotes with a grand total LESS than this require admin approval for non-admins
 const FINAL_STATES = new Set(['Accepted', 'Rejected', 'Expired']);
@@ -896,8 +896,30 @@ router.post('/leads/:leadId/quotes',
       
       await lead.update(leadUpdates, { transaction });
 
-      // --- 6. If everything is successful, commit the transaction ---
+  
       await transaction.commit();
+      try {
+  const actorName = await resolveActorName(req);
+
+  
+  const subject = `Quote Created: ${createdQuote.quoteNumber} for Lead:${lead.uniqueNumber} ${lead.customerName || lead.companyName || ''}`;
+  const message = `
+    <p>${actorName} has created a new quote with number <strong>${createdQuote.quoteNumber}</strong> for customer <strong>${lead.customerName || lead.companyName || ''}</strong>.</p>
+    <p>Status: <strong>${finalStatus}</strong></p>
+    <p>Total Amount: <strong>${createdQuote.grandTotal}</strong></p>
+  `;
+
+  // Notify admins and assigned member
+  await notifyAllRelevantParties(lead, subject, message, actorName);
+
+  // Notify shared member if applicable
+  if (sharePercent > 0) {
+    await notifySharedMemberOnQuoteCreation(createdQuote, lead, sharePercent, actorName);
+  }
+} catch (emailError) {
+  console.error('Failed to send quote creation notifications:', emailError);
+}
+
        try {
             const actorName = await resolveActorName(req);
 
@@ -912,7 +934,6 @@ router.post('/leads/:leadId/quotes',
             }
 
         } catch (emailError) {
-            // Log the error but don't fail the request, as the quote was created successfully.
             console.error('Failed to send quote creation notifications:', emailError);
         }
       res.status(201).json({

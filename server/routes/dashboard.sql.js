@@ -294,7 +294,7 @@ const getDashboardData = async (user, period) => {
   const dateFilter = { [Op.between]: [startDate, endDate] };
 
   const [members, admins] = await Promise.all([
-    Member.findAll({ attributes: ['id', 'name'], where: { isBlocked: false }, raw: true }),
+    Member.findAll({ attributes: ['id', 'name'], where: { isBlocked: false,isDeleted:false }, raw: true }),
     Admin.findAll({ attributes: ['id', 'name'], raw: true })
   ]);
   const userMap = new Map([...members.map(m => [m.id, m.name]), ...admins.map(a => [a.id, a.name])]);

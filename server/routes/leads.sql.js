@@ -296,7 +296,7 @@ router.post('/:id/attachments', authenticateToken, upload.array('files', 10), as
             await writeLeadLog(req, lead.id, 'ATTACHMENT_ADDED', `${actorLabel(req)} added ${added.length} attachment(s)`);
         }
         const actorName = await resolveActorName(req);
-    const subject = `Attachment Added to Lead: ${lead.companyName}`;
+    const subject = `Attachment Added to Lead:${lead.uniqueNumber}  ${lead.companyName}`;
     const message = `<p>${actorName} added ${added.length} new attachment(s).</p>`;
     
     await notifyAllRelevantParties(lead, subject, message, actorName);
@@ -694,7 +694,7 @@ if (req.subjectType === 'ADMIN') {
 
         if (newLead) {
           const actorName = await resolveActorName(req);
-          const subject = `New Lead Created: ${newLead.companyName}`;
+          const subject = `New Lead Created:${newLead.uniqueNumber} ${newLead.companyName}`;
           const message = `<p>A new lead has been created for <strong>${newLead.companyName}</strong> and assigned to <strong>${newLead.salesman?.name || 'N/A'}</strong>.</p>`;
 
           await notifyAllRelevantParties(newLead, subject, message, actorName);

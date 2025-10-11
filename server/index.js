@@ -142,6 +142,7 @@ const [counter, created] = await Counter.findOrCreate({
     });
 //INSERT INTO counters (name, currentValue) VALUES ('quoteNumber', 100) ON DUPLICATE KEY UPDATE name=name; run this before saving quote
     // Routes
+    
     app.use('/api/auth', authRoutes);
     app.use('/api/leads', leadsRoutes);
     app.use('/api/quotes', quoteRoutes);
@@ -164,6 +165,8 @@ const [counter, created] = await Counter.findOrCreate({
 app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.resolve(__dirname, '..', 'client', 'build', 'index.html'));
 });
+
+
     const PORT = process.env.PORT || 5000;
     server.listen(PORT, () => { console.log(`Server running on port ${PORT}`); });
   } catch (e) {

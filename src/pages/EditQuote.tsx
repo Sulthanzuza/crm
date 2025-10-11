@@ -236,6 +236,7 @@ const EditQuote: React.FC = () => {
   // --- Save Function ---
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     if (!quoteIdToEdit) { toast.error("Quote ID is missing."); return; }
     if (!customerName.trim()) { toast.error('Customer Name is required.'); return; }
     if (items.some(it => !it.product.trim() || it.quantity <= 0)) {
@@ -246,7 +247,7 @@ const EditQuote: React.FC = () => {
     const payload = buildPreviewPayload(); // Reuse the same payload logic
 
     try {
-      await quotesService.update(quoteIdToEdit, payload, token!);
+      await quotesService.updateQuote(quoteIdToEdit, payload, token!);
       toast.success("Quote updated successfully!");
       navigate(selectedLeadId ? `/leads/${selectedLeadId}` : '/quote');
     } catch (err: any) {

@@ -83,7 +83,7 @@ async function notifyAssignment(member, entityType, entity) {
 
 // 4. Notification for Lead Updates (Follow-up or Attachment added by Admin)
 async function notifyLeadUpdate(member, lead, updateType) {
-    const subject = `Update on Lead: ${lead.companyName}`;
+    const subject = `Update on Lead:${lead.uniqueNumber} ${lead.companyName}`;
     const html = `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
             <p>Hi ${member.name},</p>
@@ -97,7 +97,7 @@ async function notifyAdminsOfApprovalRequest(quote, lead) {
     const admins = await Admin.findAll({ attributes: ['email'] });
     if (!admins.length) return;
 
-    const subject = `Action Required: Quote #${quote.quoteNumber} Needs Approval`;
+    const subject = `Action Required: Quote #${lead.uniqueNumber}- ${lead.companyName} Needs Approval`;
     const html = `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
             <p>Hello Admin Team,</p>
@@ -133,6 +133,11 @@ async function notifyAdminsOfSuccess(subject, message) {
     const html = `<div style="font-family: Arial, sans-serif; line-height: 1.6;"><p>${message}</p></div>`;
     await sendEmail(admins.map(a => a.email), subject, html);
 }
+
+
+
+
+
 async function scheduleFollowupReminders(followup, lead, recipients) {
     if (!followup.scheduledAt || !recipients.length) {
         return;
@@ -141,13 +146,28 @@ async function scheduleFollowupReminders(followup, lead, recipients) {
     const scheduledTime = new Date(followup.scheduledAt).getTime();
     const now = Date.now();
 
+    // Helper to send follow-up reminder email with lead details
+    function sendReminderEmail() {
+        const subject = `Reminder: Follow-up on Lead #${lead.uniqueNumber} - ${lead.companyName}`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <p>Hi,</p>
+                <p>This is a reminder for the scheduled follow-up on lead <strong>#${lead.id} - ${lead.companyName}</strong>.</p>
+                <p><strong>Status:</strong> ${followup.status}</p>
+                <p><strong>Description:</strong> ${followup.description || 'N/A'}</p>
+                <p><strong>Scheduled At:</strong> ${new Date(followup.scheduledAt).toLocaleString()}</p>
+            </div>`;
+
+        for (const email of recipients) {
+            sendEmail(email, subject, html);  // Use your email sending utility here
+        }
+    }
+
     // --- Mandatory 3-Hour Reminder ---
     const threeHourReminderTime = scheduledTime - (3 * 60 * 60 * 1000);
     if (threeHourReminderTime > now) {
         const delay = threeHourReminderTime - now;
-        setTimeout(() => {
-            sendFollowupReminderEmail(recipients, lead, followup);
-        }, delay);
+        setTimeout(sendReminderEmail, delay);
         console.log(`Scheduled a 3-hour reminder for followup ${followup.id} to be sent to ${recipients.join(', ')}`);
     }
 
@@ -156,18 +176,25 @@ async function scheduleFollowupReminders(followup, lead, recipients) {
         const customReminderMillis = reminderToMilliseconds(followup.scheduleReminder);
         const customReminderTime = scheduledTime - customReminderMillis;
 
-        if (customReminderTime > now) {
-            // Ensure we don't send a duplicate email if the custom time is also 3 hours
-            if (customReminderMillis !== (3 * 60 * 60 * 1000)) {
-                const delay = customReminderTime - now;
-                setTimeout(() => {
-                    sendFollowupReminderEmail(recipients, lead, followup);
-                }, delay);
-                console.log(`Scheduled a custom reminder for followup ${followup.id} (${followup.scheduleReminder} before)`);
-            }
+        if (customReminderTime > now && customReminderMillis !== (3 * 60 * 60 * 1000)) {
+            const delay = customReminderTime - now;
+            setTimeout(sendReminderEmail, delay);
+            console.log(`Scheduled a custom reminder for followup ${followup.id} (${followup.scheduleReminder} before) to be sent to ${recipients.join(', ')}`);
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 async function notifySharedMemberOnQuoteCreation(quote, lead, sharePercent, creatorName) {
   try {
     // Find the sharing record for this lead
@@ -184,7 +211,7 @@ async function notifySharedMemberOnQuoteCreation(quote, lead, sharePercent, crea
       return;
     }
 
-    const subject = `New Quote Created for Shared Lead: ${lead.companyName}`;
+    const subject = `New Quote Created for Shared Lead:${lead.uniqueNumber} ${lead.companyName}`;
     const html = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <p>Hello ${sharedMember.name},</p>

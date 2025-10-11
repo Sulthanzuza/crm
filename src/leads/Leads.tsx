@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Eye } from 'lucide-react';
+import { Plus,Pen, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
@@ -66,7 +66,7 @@ const Leads: React.FC = () => {
             try {
                 const res = await leadsService.list(token, appliedFilters, signal);
                 if (!signal.aborted) {
-                        console.log(res.leads)
+                        
                     setLeads(res.leads);
                 }
             } catch (e: any) {
@@ -143,6 +143,13 @@ const Leads: React.FC = () => {
                                     sortable: false,
                                     render: (r) => (
                                         <div className="flex justify-center">
+                                            <button
+                                                className="p-2 rounded-full hover:bg-cloud-200 dark:hover:bg-midnight-700 transition"
+                                                title="View Lead"
+                                                onClick={() => navigate(`/leads/${r.id}/edit`)}
+                                            >
+                                                <Pen className="w-5 h-5 text-sky-500" />
+                                            </button>
                                             <button
                                                 className="p-2 rounded-full hover:bg-cloud-200 dark:hover:bg-midnight-700 transition"
                                                 title="View Lead"

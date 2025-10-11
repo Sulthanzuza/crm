@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { teamService, TeamUser } from '../services/teamService';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../components/ConfirmDialog';
-import { Pencil, Trash2, RefreshCw,ListRestart, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { Pencil, Trash2, RefreshCw,ListRestart, Eye, ChevronLeft, ChevronRight, PowerOffIcon, UsersRound, UserCircle } from "lucide-react";
 import {toast} from 'react-hot-toast';
 type SortKey = 'name' | 'email' | 'designation' | 'createdAt' | 'status';
 type SortDir = 'asc' | 'desc';
@@ -453,6 +453,15 @@ const Users: React.FC = () => {
                                 onClick={() => navigate(`/users/${u.id}/edit`)}
                               >
                                 <Pencil className="w-4 h-4 text-sky-500" />
+                              </div>
+                              <div className="hidden sm:inline-flex items-center justify-center 
+                                  w-8 h-8 rounded-full
+                                  bg-cloud-200/50 dark:bg-midnight-700/50 backdrop-blur-md 
+                                  hover:bg-cloud-300/70 dark:hover:bg-midnight-600/70 
+                                  shadow-md transition"
+                                onClick={() => navigate(`/users/${u.id}`)}
+                              >
+                                <UserCircle className="w-4 h-4 text-sky-500" />
                               </div>
 
                               <ToggleIconButton

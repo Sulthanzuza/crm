@@ -87,19 +87,32 @@ const Sidebar: React.FC = () => {
             Dashboard
           </span>
         </NavLink>
-       {user?.type === 'ADMIN' && (
-          <NavLink
-            to="/users"
-            className={({ isActive }) =>
-              `${linkBase} ${isActive ? linkActive : linkInactive}`
-            }
-          >
-            <UserCircle size={18} className="mr-3 flex-shrink-0" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              Users
-            </span>
-          </NavLink>
-        )}
+    {user?.type === 'ADMIN' ? (
+  <NavLink
+    to="/users"
+    className={({ isActive }) =>
+      `${linkBase} ${isActive ? linkActive : linkInactive}`
+    }
+  >
+    <UserCircle size={18} className="mr-3 flex-shrink-0" />
+    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      Users
+    </span>
+  </NavLink>
+) : (
+  <NavLink
+    to={`/users/${user?.id}`}
+    className={({ isActive }) =>
+      `${linkBase} ${isActive ? linkActive : linkInactive}`
+    }
+  >
+    <UserCircle size={18} className="mr-3 flex-shrink-0" />
+    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      Profile
+    </span>
+  </NavLink>
+)}
+
         <NavLink
           to="/leads"
           className={({ isActive }) =>

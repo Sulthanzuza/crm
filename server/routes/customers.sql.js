@@ -347,7 +347,7 @@ router.put('/:id', authenticateToken, [
       status,
       note,
     } = req.body;
-console.log('edit customer',req.body)
+
     // --- SOLUTION ---
     // Update fields, converting empty strings for ENUMs to null
     if (companyName !== undefined) c.companyName = companyName;
@@ -370,7 +370,7 @@ console.log('edit customer',req.body)
     // --- END SOLUTION ---
 
     if (salesmanId !== undefined) {
-      if (!isAdmin(req))
+      if (!isAdmin(req) && req.subjectId!==salesmanId)
         return res.status(403).json({ success: false, message: 'only admins can change salesman' });
 
       if (salesmanId) {

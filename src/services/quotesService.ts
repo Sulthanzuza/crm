@@ -124,14 +124,14 @@ getOneById: (quoteId: string, token?: string | null) =>
       body,
       token
     ),
-     updateQuote: (
-    quoteId: string,
-    body: UpdateQuotePayload,
-    token: string | null
-  ): Promise<{ success: boolean; message: string; quoteId: string }> => {
-    // This hits the new PUT /quotes/:quoteId endpoint
-    return api.put(`/quotes/${quoteId}`, body, token);
-  },
+  updateQuote: (
+  quoteId: string,
+  body: UpdateQuotePayload,
+  token: string | null
+): Promise<{ success: boolean; message: string; quoteId: string }> => {
+  return api.put(`/quotes/${quoteId}`, body, token);
+},
+
   previewHtml: async (leadId: string, quoteId: string, token?: string | null): Promise<{ success: boolean; html: string }> => {
     const res = await fetch(`${apiOrigin()}/leads/${leadId}/quotes/${quoteId}/preview`, {
       method: 'GET',

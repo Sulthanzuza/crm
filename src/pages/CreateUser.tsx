@@ -87,8 +87,7 @@ const onSubmit = async (e: React.FormEvent) => {
             designation: 'Sales',
         }, token);
 
-        // 1. Pass the success message in the navigation state
-        navigate('/users', { 
+       navigate('/users', { 
             replace: true, 
             state: { message: 'User created successfully!' } 
         });

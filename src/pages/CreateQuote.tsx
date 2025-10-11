@@ -592,11 +592,13 @@ const CreateQuote: React.FC = () => {
                           <td className="px-3 py-2 text-right">
                             <input
                               type="number"
-                              min="0"
-                              value={item.unitCost}
-                              onChange={(e) =>
-                                handleItemChange(idx, { unitCost: Number(e.target.value) })
-                              }
+  min="0"
+  value={item.unitCost === 0 ? '' : item.unitCost}
+  onChange={(e) =>
+    handleItemChange(idx, {
+      unitCost: e.target.value === '' ? 0 : Number(e.target.value),
+    })
+  }
                               className="w-full px-2 py-1.5 text-right rounded-lg border border-cloud-300/50 bg-white/70 focus:border-sky-400 focus:ring-1 focus:ring-sky-300/40 outline-none transition"
                             />
                           </td>
@@ -608,13 +610,13 @@ const CreateQuote: React.FC = () => {
                           <td className="px-3 py-2 text-right">
                             <input
                               type="number"
-                              min="0"
-                              value={item.marginPercent}
-                              onChange={(e) =>
-                                handleItemChange(idx, {
-                                  marginPercent: Number(e.target.value),
-                                })
-                              }
+  min="0"
+  value={item.marginPercent === 0 ? '' : item.marginPercent}
+  onChange={(e) =>
+    handleItemChange(idx, {
+      marginPercent: e.target.value === '' ? 0 : Number(e.target.value),
+    })
+  }
                               className="w-full px-2 py-1.5 text-right rounded-lg border border-cloud-300/50 bg-white/70 focus:border-sky-400 focus:ring-1 focus:ring-sky-300/40 outline-none transition"
                             />
                           </td>

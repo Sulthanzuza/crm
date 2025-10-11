@@ -57,7 +57,7 @@ const NewContactModal: React.FC<Props> = ({ open, onClose, customerId, onCreated
        toast.error('Designation is required');
       return;
     }
-    if (!mobile.trim() || !email.trim() ) {
+    if (!mobile.trim() ) {
      toast.error('Mobile number is required');
       return;
     }
@@ -65,6 +65,11 @@ const NewContactModal: React.FC<Props> = ({ open, onClose, customerId, onCreated
         toast.error('Mobile number must contain only digits (0-9).');
         return;
     }
+    if (!email.trim() ) {
+     toast.error('Email is required');
+      return;
+    }
+    
     if (email && !/^\S+@\S+\.\S+$/.test(email)) {
     toast.error('Please provide a valid email');
       return;

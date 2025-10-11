@@ -31,6 +31,7 @@ import { Toaster } from 'react-hot-toast';
 import CloneQuote from './pages/CloneQuote';
 import EditQuote from './pages/EditQuote'
 import ReportsPage from './pages/ReportsPage';
+import SalesmanProfile from './pages/SalesmanProfile';
 function App() {
   return (
     <AuthProvider>
@@ -62,6 +63,8 @@ function App() {
             <Route path="/leads/:id" element={<LeadDetail />} />
 <Route path="/leads/:id/edit" element={<EditLead />} />
 <Route path="/users" element={<Users />} />
+<Route path="/users/:id" element={<SalesmanProfile />} />
+<Route path="/profile" element={<SalesmanProfile />} />
 <Route path="/users/create" element={<CreateUser />} />
 <Route path="/users/:id/edit" element={<EditUser />} />
 <Route path="/customers" element={<Customers />} />

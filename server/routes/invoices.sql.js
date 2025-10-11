@@ -9,6 +9,7 @@ const InvoiceItem = require('../models/InvoiceItem');
 const Quote = require('../models/Quote');
 const QuoteItem = require('../models/QuoteItem');
 const Lead = require('../models/Lead');
+const LeadLog = require('../models/LeadLog');
 const { authenticateToken,isAdmin } = require('../middleware/auth');
 const puppeteer = require('puppeteer');
 const router = express.Router();
@@ -264,7 +265,39 @@ function buildInvoiceHTML({ invoice, items, creator, logoBase64 }) {
 </body>
 </html>`;
 }
-
+function actorLabel(req) { return req.subjectType === 'ADMIN' ? 'Admin' : 'Member'; }
+async function resolveActorName(req) {
+  if (req.subjectType === 'ADMIN') return 'Admin';
+  if (req.subjectType === 'MEMBER') {
+    const m = await Member.findByPk(req.subjectId, { attributes: ['name'] });
+    return m?.name || 'Member';
+  }
+  return 'System';
+}
+async function writeLeadLog(req, leadId, action, message) {
+  const actorName = await resolveActorName(req);
+  const created = await LeadLog.create({
+    leadId,
+    action,
+    message,
+    actorType: req.subjectType,
+    actorId: req.subjectId,
+    actorName
+  });
+  req.app.get('io')?.to(`lead:${leadId}`).emit('log:new', {
+    leadId: String(leadId),
+    log: {
+      id: created.id,
+      action: created.action,
+      message: created.message,
+      actorType: created.actorType,
+      actorId: created.actorId,
+      actorName: created.actorName,
+      createdAt: created.createdAt
+    }
+  });
+  return created;
+}
 
 
 
@@ -389,7 +422,7 @@ router.post('/from-quote/:quoteId', authenticateToken, async (req, res) => {
 
         const invoiceItemsData = quote.items.map((item, index) => {
             const quantity = Number(item.quantity) || 0;
-            const itemRate = Number(item.totalPrice) || 0; // Rate is the QuoteItem's total price
+            const itemRate = Number(item.unitPrice) || 0; // Rate is the QuoteItem's total price
             
             const lineSubtotal = itemRate * quantity;
             const taxAmount = lineSubtotal * (FIXED_TAX_PERCENT / 100);
@@ -450,7 +483,8 @@ router.post('/from-quote/:quoteId', authenticateToken, async (req, res) => {
 
         // --- 5. Commit the transaction and Respond ---
         await transaction.commit();
-
+ await writeLeadLog(req, newInvoice.leadId, 'QUOTE_CONVERTED', `${actorLabel(req)} converted to invoice #${newInvoice.invoiceNumber}`).catch(() => {});
+           
         const fullInvoice = await Invoice.findByPk(newInvoice.id, { include: ['items', 'salesman'] });
         res.status(201).json({ success: true, message: 'Quote successfully converted to invoice.', invoice: fullInvoice });
 
@@ -648,9 +682,9 @@ router.get('/:id/download', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, message: 'Invoice not found' });
         }
         
-        if (!invoice.isApproved && !isAdmin(req)) {
-            return res.status(403).json({ success: false, message: 'Quote requires admin approval for download.' });
-        }
+        // if (!invoice.isApproved && !isAdmin(req)) {
+        //     return res.status(403).json({ success: false, message: 'Quote requires admin approval for download.' });
+        // }
         
         const creator = invoice.memberCreator || invoice.adminCreator;
 
