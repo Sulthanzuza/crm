@@ -21,7 +21,7 @@ type FormState = {
   vatNo: string;
   address: string;
   industry: string;
-  category: '' | 'Enterprise' | 'SMB' | 'Individual';
+  category: '' | 'Enterprise' | 'SMB' | 'Individual' | 'SME' ;
   website: string;
   country: string;
   sizeOfCompany: '' | '1-10' | '11-50' | '51-200' | '201-500' | '500+';

@@ -117,7 +117,7 @@ const [lead, setLead] = useState<Lead | null>(null);
     const grandTotal = netAfterDiscount + totalVat;
     const grossProfit = netAfterDiscount - businessTotalCost;
     const profitPercent = netAfterDiscount > 0 ? (grossProfit / netAfterDiscount) * 100 : 0;
-    const sharedProfit = leadIsShared ? (grandTotal * (sharePercent || 0)) / 100 : 0;
+    const sharedProfit = leadIsShared ? (grossProfit * (sharePercent || 0)) / 100 : 0;
 
     return { subtotal, businessTotalCost, totalVat, discountAmount, netAfterDiscount, grandTotal, grossProfit, profitPercent, sharedProfit };
   }, [items, discountMode, discountValue, sharePercent, leadIsShared]);

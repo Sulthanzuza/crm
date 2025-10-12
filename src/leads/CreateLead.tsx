@@ -15,7 +15,7 @@ import { Plus } from 'lucide-react';
 type CustomerLite = { id: string; companyName: string };
 
 
-const STAGES = ['Discover', 'Solution Validation', 'Quote Negotiation', 'Deal Closed', 'Deal Lost', 'Fake Lead'] as const;
+const STAGES = ['Discover', 'Solution Validation', 'Quote Negotiation', 'Closed Won', 'Closed Lost', 'Fake Lead'] as const;
 const FORECASTS = ['Pipeline', 'BestCase', 'Commit'] as const;
 const SOURCES = ['Website', 'Referral', 'Advertisement', 'Event', 'Cold Call', 'Other'] as const;
 

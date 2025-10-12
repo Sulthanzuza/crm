@@ -124,13 +124,24 @@ const Sidebar: React.FC = () => {
             Leads
           </span>
         </NavLink>
+         <NavLink
+          to="/quote"
+          className={({ isActive }) =>
+            `${linkBase} ${isActive ? linkActive : linkInactive}`
+          }
+        >
+          <TextQuote size={18} className="mr-3 flex-shrink-0" />
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            Quote
+          </span>
+        </NavLink>
         <NavLink
           to="/deals"
           className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkInactive}`}
         >
           <Handshake size={18} className="mr-3 flex-shrink-0" />
           <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          Deals
+          Won Ops
           </span>
         </NavLink>
 
@@ -146,17 +157,7 @@ const Sidebar: React.FC = () => {
             Customers
           </span>
         </NavLink>
-        <NavLink
-          to="/quote"
-          className={({ isActive }) =>
-            `${linkBase} ${isActive ? linkActive : linkInactive}`
-          }
-        >
-          <TextQuote size={18} className="mr-3 flex-shrink-0" />
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            Quote
-          </span>
-        </NavLink>
+       
         <NavLink
           to="/contacts"
           className={({ isActive }) =>

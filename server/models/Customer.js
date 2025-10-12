@@ -20,7 +20,7 @@ Customer.init({
 industry: { type: DataTypes.STRING(120), allowNull: true },        // Industry / Business Type
 website: { type: DataTypes.STRING(200), allowNull: true },         // Website
 category: {                                                        // Customer Category
-  type: DataTypes.ENUM('Enterprise','SMB','Individual'),
+  type: DataTypes.ENUM('Enterprise','SMB','Individual','SME'),
   allowNull: true
 },contactedBy: {
     // Use JSON for portability; switch to JSONB if on Postgres

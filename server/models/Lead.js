@@ -5,8 +5,8 @@ const STAGES = [
   'Discover',
   'Solution Validation',
   'Quote Negotiation',
-  'Deal Closed',
-  'Deal Lost',
+  'Closed Won',
+  'Closed Lost',
   'Fake Lead'
 ];
 

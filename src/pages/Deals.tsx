@@ -75,7 +75,7 @@ const Deals: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
             <div>
               <h1 className="text-2xl font-extrabold text-gray-900 dark:text-ivory-200">
-                Closed Deals
+              Won Ops
               </h1>
               <p className="text-gray-600 dark:text-midnight-400">
                 View and manage all closed deals.

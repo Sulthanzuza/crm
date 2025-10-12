@@ -26,7 +26,7 @@ const NewCustomerModal: React.FC<Props> = ({ open, onClose, onCreated }) => {
   // New fields on Customer
   const [industry, setIndustry] = useState('');
   const [website, setWebsite] = useState('');
-  const [category, setCategory] = useState<'Enterprise' | 'SMB' | 'Individual' | ''>('');
+  const [category, setCategory] = useState<'Enterprise' | 'SMB' | 'Individual' | 'SME' | ''>('');
 
   const [salesmen, setSalesmen] = useState<TeamUser[]>([]);
   const [salesmanId, setSalesmanId] = useState('');

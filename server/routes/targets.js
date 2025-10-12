@@ -53,7 +53,7 @@ router.get('/members', authenticateToken, async (req, res) => {
     try {
         const members = await Member.findAll({
             attributes: ['id', 'name'],
-            where: { isBlocked: false }
+            where: { isBlocked: false,isDeleted: false },
         });
         res.json({ success: true, data: members });
     } catch (error) {

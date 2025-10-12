@@ -166,7 +166,8 @@ const EditQuote: React.FC = () => {
     const grandTotal = netAfterDiscount + totalVat;
     const grossProfit = netAfterDiscount - businessTotalCost;
     const profitPercent = netAfterDiscount > 0 ? (grossProfit / netAfterDiscount) * 100 : 0;
-    return { subtotal, businessTotalCost, totalVat, discountAmount, netAfterDiscount, grandTotal, grossProfit, profitPercent };
+  const sharedProfit = leadIsShared ? (grossProfit * (sharePercent || 0)) / 100 : 0;
+    return { subtotal, businessTotalCost, totalVat, discountAmount, netAfterDiscount, grandTotal, grossProfit, profitPercent,sharedProfit };
   }, [items, discountMode, discountValue]);
 
   // --- Helper Functions ---
@@ -486,6 +487,9 @@ const EditQuote: React.FC = () => {
                     <p className="flex justify-between text-base font-semibold text-sky-600"><span>Grand Total:</span> {totals.grandTotal?.toFixed(2) ?? '0.00'}</p>
                     <p className="flex justify-between text-green-700"><span className="font-medium">Gross Profit:</span> {totals.grossProfit?.toFixed(2) ?? '0.00'}</p>
                     <p className="flex justify-between text-green-700"><span className="font-medium">Profit %:</span> {totals.profitPercent?.toFixed(2) ?? '0.00'}%</p>
+                     {leadIsShared && totals.sharedProfit != null && totals.sharedProfit > 0 && (
+                        <p className="flex justify-between text-yellow-600 dark:text-yellow-400"><span className="font-medium">Shared Profit:</span> {totals.sharedProfit.toFixed(2)}</p>
+                      )}
                   </div>
 
 

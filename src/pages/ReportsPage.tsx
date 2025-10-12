@@ -10,6 +10,7 @@ import { format, parseISO, isAfter, isBefore } from 'date-fns';
 import debounce from 'lodash.debounce';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import * as XLSX from 'xlsx';
 
 
 // --- FILTERABLE HEADER COMPONENT ---
@@ -280,6 +281,53 @@ const ReportsPage: React.FC = () => {
         setDateFilter(filter);
         setShowDateDropdown(false);
     }
+const handleExport = async () => {
+  if (!token) return;
+
+  try {
+    const params: ReportParams = {
+      dateFilter,
+      customStartDate: dateFilter === 'custom' ? customStartDate : undefined,
+      customEndDate: dateFilter === 'custom' ? customEndDate : undefined,
+      filters: columnFilters.map(f => ({ field: f.id, include: f.value as any[] })),
+      sortBy: sorting[0]?.id,
+      sortOrder: sorting[0]?.desc ? 'DESC' : 'ASC',
+      page: 1,
+      pageSize: 1000000,
+    };
+
+    const res = await reportsService.getLeadReport(params, token);
+
+    if (res.success) {
+   const exportData = (res.results as LeadReportRow[]).map(row => ({
+  'Lead Name': row.companyName,
+  'Lead ID': row.uniqueNumber,
+  'Salesman': row.salesmanName,
+  'Stage': row.stage,
+  'Forecast': row.forecastCategory,
+  'Quote Number': row.quoteNumber,
+  'Quote Value': row.quoteValue ? row.quoteValue.toLocaleString() : '',
+  'GP Amount': row.gpAmount ? row.gpAmount.toLocaleString() : '',
+  'GP %': typeof row.gpPercentage === 'number' ? row.gpPercentage.toFixed(2) : '',
+  'Created Date': row.createdAt ? format(new Date(row.createdAt), 'yyyy-MM-dd HH:mm') : '',
+}));
+
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'FilteredData');
+
+      const exportFileName = dateFilter === 'custom'
+        ? `SalesReport_${customStartDate}_to_${customEndDate}.xlsx`
+        : `SalesReport_${dateFilterLabels[dateFilter].replace(/\s+/g, '')}.xlsx`;
+
+      XLSX.writeFile(workbook, exportFileName);
+    }
+  } catch (e) {
+    console.error('Export failed:', e);
+  }
+};
+
 
     return (
         <div className="flex min-h-screen z-10 transition-colors duration-300">
@@ -288,50 +336,62 @@ const ReportsPage: React.FC = () => {
                 <div className="p-6 min-h-screen">
                     {/* <Sidebar/> */}
                     <h1 className="text-3xl font-bold text-gray-900">Lead Reports</h1>
-                    <div className="my-6 p-4 bg-white rounded-lg shadow-sm flex flex-wrap items-center gap-4 z-20">
-                        <div ref={dateFilterRef} className="flex items-center gap-2 flex-wrap relative">
-                            <strong>Closing Date:</strong>
-                            <button
-                                className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded cursor-pointer flex items-center gap-2"
-                                onClick={() => setShowDateDropdown(s => !s)}
-                            >
-                                <Calendar size={16} />
-                                <span>{dateFilterLabels[dateFilter]}</span>
-                            </button>
-                            {showDateDropdown && (
-                                <div className="absolute top-full left-0 z-50 mt-2 bg-white border border-gray-300 rounded shadow-lg min-w-[200px] max-h-60 overflow-auto">
-                                    <div>
-                                        {Object.entries(dateFilterLabels).map(([key, label]) => (
-                                            <div
-                                                key={key}
-                                                className="px-4 py-2 cursor-pointer hover:bg-gray-100 rounded"
-                                                onMouseDown={() => handleDateSelect(key)}
-                                            >
-                                                {label}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                        {dateFilter === 'custom' && (
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="date"
-                                    value={customStartDate}
-                                    onChange={e => setCustomStartDate(e.target.value)}
-                                    className="px-2 py-1 border border-gray-300 rounded"
-                                />
-                                <span>to</span>
-                                <input
-                                    type="date"
-                                    value={customEndDate}
-                                    onChange={e => setCustomEndDate(e.target.value)}
-                                    className="px-2 py-1 border border-gray-300 rounded"
-                                />
-                            </div>
-                        )}
-                    </div>
+                   <div className="my-6 p-4 bg-white rounded-lg shadow-sm flex flex-wrap items-center gap-4 z-20 justify-between">
+  <div className="flex items-center gap-2 flex-wrap relative" ref={dateFilterRef}>
+    <strong>Closing Date:</strong>
+    <button
+      className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded cursor-pointer flex items-center gap-2"
+      onClick={() => setShowDateDropdown(s => !s)}
+    >
+      <Calendar size={16} />
+      <span>{dateFilterLabels[dateFilter]}</span>
+    </button>
+
+    {showDateDropdown && (
+      <div className="absolute top-full left-0 z-50 mt-2 bg-white border border-gray-300 rounded shadow-lg min-w-[200px] max-h-60 overflow-auto">
+        <div>
+          {Object.entries(dateFilterLabels).map(([key, label]) => (
+            <div
+              key={key}
+              className="px-4 py-2 cursor-pointer hover:bg-gray-100 rounded"
+              onMouseDown={() => handleDateSelect(key)}
+            >
+              {label}
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+
+  {dateFilter === 'custom' && (
+    <div className="flex items-center gap-2">
+      <input
+        type="date"
+        value={customStartDate}
+        onChange={e => setCustomStartDate(e.target.value)}
+        className="px-2 py-1 border border-gray-300 rounded"
+      />
+      <span>to</span>
+      <input
+        type="date"
+        value={customEndDate}
+        onChange={e => setCustomEndDate(e.target.value)}
+        className="px-2 py-1 border border-gray-300 rounded"
+      />
+    </div>
+  )}
+
+  <div className="ml-auto">
+    <button
+      onClick={handleExport}
+      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap"
+    >
+      Export to Excel
+    </button>
+  </div>
+</div>
+
 
 
                     <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl overflow-hidden shadow-2xl">

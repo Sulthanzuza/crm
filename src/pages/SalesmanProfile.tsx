@@ -184,7 +184,7 @@ const SalesmanProfile: React.FC = () => {
               <BarChart data={invoiceStatuses}>
                 <XAxis dataKey="status" stroke="#FF8042" />
                 <YAxis stroke="#FF8042" />
-                <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                <Tooltip formatter={(value: number) => `${value.toFixed(2)}`} />
                 <Legend />
                 <Bar dataKey="count" fill="#FF8042" name="Count" />
                 <Bar dataKey="totalAmount" fill="#FFBB28" name="Total Amount" />

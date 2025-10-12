@@ -633,7 +633,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
                 // Also update the related lead's stage
                 if (invoice.quote && invoice.quote.lead) {
                     const lead = invoice.quote.lead;
-                    lead.stage = 'Deal Closed';
+                    lead.stage = 'Closed Won';
                     await lead.save({ transaction: t });
                 }
             }
