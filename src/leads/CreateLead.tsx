@@ -29,7 +29,7 @@ const CreateLead: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const [allSalesmen, setAllSalesmen] = useState<TeamUser[]>([]); // To store the full list
+  const [allSalesmen, setAllSalesmen] = useState<TeamUser[]>([]); 
   const [salesmanId, setSalesmanId] = useState(isAdmin ? '' : user?.id || '');
 
   const [customers, setCustomers] = useState<CustomerLite[]>([]);
@@ -64,7 +64,6 @@ const CreateLead: React.FC = () => {
   const [openNewContact, setOpenNewContact] = useState(false);
 
 
-  // Load team and customers
   useEffect(() => {
     if (!token) return;
     (async () => {
@@ -76,7 +75,7 @@ const CreateLead: React.FC = () => {
         
          setAllSalesmen(teamRes.users);
       
-        console.log(teamRes)
+    
         const liteCustomers = customersRes.customers.map((c) => ({ id: c.id, companyName: c.companyName }));
         setCustomers(liteCustomers);
 
@@ -100,7 +99,7 @@ const CreateLead: React.FC = () => {
       });
     }
   }, [stage]);
-  // When customer changes, fetch its contacts
+
   useEffect(() => {
     if (!customerId || !token) {
       setContacts([]);
@@ -113,19 +112,18 @@ const CreateLead: React.FC = () => {
         const contactList = res.contacts || [];
         setContacts(contactList);
         if (contactList.length > 0) {
-          // Auto-select the first contact
-          setContactId(contactList[0].id);
+          
         } else {
           setContactId('');
         }
       } catch {
-        // ignore
+       
       }
     })();
   }, [customerId, token]);
 
 
-  // If selected contact changes, copy details into editable fields
+ 
   useEffect(() => {
     const found = contacts.find((c) => c.id === contactId);
     if (found) {
@@ -133,7 +131,7 @@ const CreateLead: React.FC = () => {
       setMobile(found.mobile || '');
       setEmailField(found.email || '');
     } else {
-      // Clear fields if no contact is selected or found
+      
       setContactPerson('');
       setMobile('');
       setEmailField('');
@@ -181,7 +179,7 @@ const save = async (e: React.FormEvent) => {
                 salesmanId,
             };
 
-            // --- SIMPLIFIED: Conditionally add accompanied salesman ID ---
+           
             if (accompanySalesman && accompaniedMemberId) {
                 payload.shareGpData = {
                     sharedMemberId: accompaniedMemberId,
@@ -197,17 +195,16 @@ const save = async (e: React.FormEvent) => {
             setSubmitting(false);
         }
     };
-console.log(allSalesmen)
+
 const availableForAccompaniment = allSalesmen.filter(member => {
-    // Rule 1: Exclude any member who is blocked.
+    
     if (member.isBlocked) {
         return false;
     }
-    // Rule 2: Exclude the member who is already the primary salesman for this lead.
-    if (member.id === salesmanId) {
+  if (member.id === salesmanId) {
         return false;
     }
-    // If neither exclusion rule applies, include the member.
+   
     return true;
 });
 
@@ -235,7 +232,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
             className="space-y-6 bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl 
            p-6 rounded-2xl shadow-xl border border-cloud-300/30 dark:border-midnight-700/30"
           >
-            {/* Stage */}
+          
             <div>
               <div className="text-sm font-bold text-midnight-800 dark:text-ivory-200 mb-3 tracking-wide">
                 Lead Stage
@@ -244,13 +241,13 @@ const availableForAccompaniment = allSalesmen.filter(member => {
                 ref={containerRef}
                 className="relative flex w-full items-center p-1 rounded-full bg-cloud-200/60 dark:bg-midnight-800/60 backdrop-blur-sm border border-cloud-300/40 dark:border-midnight-700/40"
               >
-                {/* Sliding Indicator */}
+                
                 <span
                   className="absolute top-1 bottom-1 h-auto rounded-full bg-sky-500 shadow-lg transition-all duration-300 ease-in-out"
                   style={indicatorStyle}
                 />
 
-                {/* Buttons */}
+                
                 {STAGES.map((s, index) => (
                   <button
                     key={s}
@@ -268,7 +265,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
               </div>
             </div>
 
-            {/* Forecast */}
+            
             <div>
               <div className="text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">Forecast</div>
               <div className="flex gap-4">
@@ -287,7 +284,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
               </div>
             </div>
 
-            {/* Customer + Source */}
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">
@@ -296,7 +293,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
                 <div className="flex gap-2">
                   <div className='w-full'>
                     <CustomSelect
-                      label={null} // Label is already rendered above, so skip inside component
+                      label={null}
                       options={customers.map((c) => ({
                         value: c.id,
                         label: c.companyName,
@@ -316,9 +313,9 @@ const availableForAccompaniment = allSalesmen.filter(member => {
                 </div>
               </div>
               <div>
-                {/* <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">Source</label> */}
+              
                 <CustomSelect
-                  label="Source" // The label is already above, so skip inside the component
+                  label="Source" 
                   options={SOURCES.map((s) => ({
                     value: s,
                     label: s,
@@ -330,7 +327,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
               </div>
             </div>
 
-            {/* Contact + Salesman */}
+           
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">Contact*</label>
@@ -374,7 +371,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
                     value={salesmanId}
                     onChange={(val) => {
                       setSalesmanId(val);
-                      // Prevent conflict if the same salesman is chosen for accompaniment
+                    
                       if (val === accompaniedMemberId) {
                         setAccompaniedMemberId('');
                       }
@@ -382,7 +379,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
                     options={allSalesmen.map((s) => ({
                       value: s.id,
                       label: `${s.name}${s.isBlocked ? ' (Blocked)' : ''}`,
-                      isDisabled: s.isBlocked, // keep disabled logic
+                      isDisabled: s.isBlocked,
                     }))}
                     placeholder="-- Select Salesman --"
                   />
@@ -401,7 +398,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
 
 
 
-            {/* Contact Override Fields */}
+         
             <div className="grid grid-cols-2 sm:grid-cols-2 gap-6 pt-4 border-t border-cloud-200/40 dark:border-midnight-700/40">
               <div>
                 <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">Contact Person Name</label>
@@ -452,7 +449,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
 
 
 
-            {/* Description */}
+         
             <div>
               <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">Description / Notes</label>
               <textarea
@@ -495,7 +492,7 @@ const availableForAccompaniment = allSalesmen.filter(member => {
               )}
             </div>
 
-            {/* Buttons */}
+          
             <div className="flex justify-end gap-4 pt-4">
               <Button
                 type="button"

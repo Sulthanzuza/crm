@@ -8,10 +8,7 @@ const VendorContact = require('../models/VendorContact');
 const Lead = require('../models/Lead');
 const router = express.Router();
 const Member = require('../models/Member')
-// --- HIGH-LEVEL & SPECIFIC ROUTES FIRST ---
 
-// GET /contacts -> Lists all individual customer contacts.
-// routes/contacts.js (or similar file)
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const search = String(req.query.search || '').trim();
@@ -30,11 +27,11 @@ router.get('/', authenticateToken, async (req, res) => {
                 {
                     model: Customer,
                     attributes: ['id', 'companyName'],
-                    // UPDATED: Nested include to get the salesman (creator) from the Customer model
+                    
                     include: [{
                         model: Member,
                         
-                        as: 'salesman', // Use the alias defined in your Customer model association
+                        as: 'salesman', 
                         attributes: ['id', 'name', 'email']
                     }]
                 }
@@ -50,7 +47,7 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 
-// POST /contacts -> Creates a new CustomerContact.
+
 router.post('/', authenticateToken, async (req, res) => {
     try {
         const { customerId, name, ...otherFields } = req.body;
@@ -69,8 +66,7 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
-// GET /contacts/search -> Unified search for the entity selection modal.
-// This route is critical and MUST come before the dynamic '/:id' route.
+
 router.get('/search', authenticateToken, async (req, res) => {
     const { query = '' } = req.query;
     const { subjectId: userId, subjectType: userRole } = req;
@@ -122,15 +118,12 @@ router.post('/bulk-delete', authenticateToken, async (req, res) => {
 });
 
 
-// --- DYNAMIC ROUTES LAST ---
 
-// GET /contacts/:id -> This is the consolidated, intelligent endpoint.
-// It fetches contacts for any entity type (Vendor, Lead, Customer) based on the ID.
 router.get('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
 
     try {
-        // 1. Check if ID belongs to a Vendor
+        
         const vendor = await Vendor.findByPk(id);
         if (vendor) {
             const vendorContacts = await VendorContact.findAll({ where: { vendorId: id } });
@@ -141,20 +134,20 @@ router.get('/:id', authenticateToken, async (req, res) => {
             return res.json({ success: true, contacts });
         }
 
-        // 2. Check if ID belongs to a Lead
+        
         const lead = await Lead.findByPk(id, { include: [{ model: Customer, as: 'customer' }] });
         if (lead) {
-            if (lead.customer) { // Lead is linked to an existing Customer
+            if (lead.customer) { 
                 const customerContacts = await CustomerContact.findAll({ where: { customerId: lead.customer.id } });
                 const contacts = customerContacts.map((c, index) => ({ id: c.id, name: c.name, email: c.email, phone: c.mobile, isPrimary: lead.contactPerson === c.name || index === 0, entityType: 'Customer', companyId: lead.customer.id, companyName: lead.customer.companyName, address: lead.customer.address }));
                 return res.json({ success: true, contacts });
-            } else { // Standalone Lead (not yet converted to a customer)
+            } else { 
                 const contact = { id: lead.id, name: lead.contactPerson, email: lead.email, phone: lead.mobile, isPrimary: true, entityType: 'Lead', companyId: lead.id, companyName: lead.companyName, address: lead.city };
                 return res.json({ success: true, contacts: [contact] });
             }
         }
 
-        // 3. Check if ID belongs to a Customer
+        
         const customer = await Customer.findByPk(id);
         if (customer) {
             const customerContacts = await CustomerContact.findAll({ where: { customerId: id } });
@@ -162,13 +155,13 @@ router.get('/:id', authenticateToken, async (req, res) => {
             return res.json({ success: true, contacts });
         }
 
-        // 4. Check if ID belongs to a specific CustomerContact (for fetching single contact details)
+        
         const contact = await CustomerContact.findByPk(id, { include: [{ model: Customer, attributes: ['id', 'companyName'] }] });
         if (contact) {
-            return res.json({ success: true, contact: contact }); // Note: sending 'contact', not 'contacts'
+            return res.json({ success: true, contact: contact }); 
         }
         
-        // 5. If no entity is found, return 404
+        
         return res.status(404).json({ success: false, message: 'No Vendor, Lead, Customer, or Contact found with this ID.' });
 
     } catch (error) {
@@ -177,7 +170,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// PUT /contacts/:id -> Updates a specific CustomerContact.
+
 router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const [updatedCount] = await CustomerContact.update(req.body, { where: { id: req.params.id } });
@@ -192,7 +185,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// DELETE /contacts/:id -> Deletes a specific CustomerContact.
+
 router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const count = await CustomerContact.destroy({ where: { id: req.params.id } });

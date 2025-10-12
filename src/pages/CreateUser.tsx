@@ -20,17 +20,17 @@ const CreateUser: React.FC = () => {
         confirmPassword: '',
     });
 
-    // State to manage password visibility
+    
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
     const [isFormValid, setIsFormValid] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     
-    // State to track if the user has tried to submit the form
+  
     const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
     
-    // State for validation errors
+  
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const validateForm = () => {
@@ -55,7 +55,7 @@ const CreateUser: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // This effect now only validates if a submission has been attempted
+   
     useEffect(() => {
         if (hasAttemptedSubmit) {
             const isValid = validateForm();

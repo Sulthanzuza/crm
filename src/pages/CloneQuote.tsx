@@ -12,7 +12,7 @@ import { teamService, TeamUser } from '../services/teamService';
 import { customerService } from '../services/customerService';
 import PreviewModal from '../components/PreviewModal'; // <-- 1. Import PreviewModal
 import { X } from 'lucide-react';
-
+import CustomSelect from '../components/CustomSelect';
 import { toast } from 'react-hot-toast';
 
 // --- Type Definitions ---
@@ -45,7 +45,7 @@ type SavedQuote = {
   isApproved?: boolean;
 };
 
-// CSS to hide number input spinners
+
 const noSpinnersCSS = `
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -58,7 +58,7 @@ const CloneQuote: React.FC = () => {
   const { token, user } = useAuth();
   const isAdmin = user?.type === 'ADMIN';
 const [lead, setLead] = useState<Lead | null>(null);
-  // --- State Declarations ---
+  
   const [items, setItems] = useState<ItemState[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [leadNumber, setLeadNumber] = useState('');
@@ -91,7 +91,7 @@ const [lead, setLead] = useState<Lead | null>(null);
 
   const today = new Date().toISOString().split('T')[0];
 
-  // --- Live Calculation Logic ---
+  
   const totals = useMemo(() => {
     let subtotal = 0;
     let businessTotalCost = 0;
@@ -132,7 +132,7 @@ const [lead, setLead] = useState<Lead | null>(null);
       }
     })();
   }, [token]);
-  // --- Core Functions ---
+  
   const addRow = () => setItems(prev => [...prev, { slNo: prev.length + 1, product: '', description: '', quantity: 1, unitCost: 0, marginPercent: 0, vatPercent: 5 }]);
   const removeRow = (idx: number) => setItems(prev => prev.filter((_, i) => i !== idx).map((it, idx2) => ({ ...it, slNo: idx2 + 1 })));
   const handleItemChange = (idx: number, patch: Partial<ItemState>) => setItems(prev => prev.map((item, i) => (i === idx ? { ...item, ...patch } : item)));
@@ -153,8 +153,7 @@ const [lead, setLead] = useState<Lead | null>(null);
     setEmail(contact.email || '');
   };
 
-  // --- Save Function (Creates a new quote from the current state) ---
-// src/pages/CloneQuote.tsx
+
     const handlePreview = async () => {
         setPreviewLoading(true);
         try {
@@ -213,7 +212,6 @@ const [lead, setLead] = useState<Lead | null>(null);
     const fetchQuoteDataForCloning = async () => {
       try {
         const { quote } = await quotesService.getOneById(quoteIdToClone, token);
-console.log(quote)
         setSelectedLeadId(quote.leadId);
         setCustomerName(quote.customerName || '');
         setContactPerson(quote.contactPerson || '');
@@ -229,7 +227,6 @@ console.log(quote)
         setDiscountValue(Number(quote.discountValue) || 0);
         setSalesmanId(isAdmin ? quote.salesmanId : user.id);
 
-        // This correctly sets the share status from the quote data
         const isShared = Array.isArray(quote.shares) && quote.shares.length > 0;
         setLeadIsShared(isShared);
 
@@ -264,30 +261,13 @@ console.log(quote)
   }, [quoteIdToClone, token, navigate, isAdmin, user]);
 
 
-  // useEffect(() => {
-  //   if (!token || !selectedLeadId) return;
-  //   (async () => {
-  //     try {
-  //       const { lead } = await leadsService.getOne(selectedLeadId, token);
-  //       setLeadNumber(lead.uniqueNumber || '');
-  //       setLeadIsShared(Array.isArray(lead.shares) && lead.shares.length > 0);
-  //       if (lead.customer?.id) {
-  //         const contactsResp = await customerService.getContacts(lead.customer.id, token);
-  //         setContacts(contactsResp.contacts || []);
-  //       }
-  //     } catch (error) {
-  //       toast.error('Failed to load associated lead details.');
-  //     }
-  //   })();
-  // }, [token, selectedLeadId]);
 
   const canViewSharePercent = useMemo(() => {
-    // If the user is admin, they can always see it.
+   
     if (isAdmin) {
         return true;
     }
-    // For non-admins, show the field only if the lead is shared.
-    // The sharePercent state is correctly set in the useEffect hook.
+   
     return leadIsShared;
   }, [leadIsShared, isAdmin]);
 
@@ -307,7 +287,7 @@ console.log(quote)
             </div>
 
             <form onSubmit={save} className="space-y-6 bg-cloud-50/40 dark:bg-midnight-900/40 backdrop-blur-xl border border-cloud-300/40 dark:border-midnight-700/40 rounded-2xl p-8 shadow-xl">
-              {/* --- Form content is identical to CreateQuote.tsx --- */}
+            
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Lead Number</label>
@@ -327,19 +307,20 @@ console.log(quote)
                 <div>
                   <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Salesman</label>
                   {isAdmin ? (
-                    <select
-                      value={salesmanId}
-                      className="w-full h-11 px-4 rounded-xl border ..."
-                      onChange={(e) => setSalesmanId(e.target.value)}
-                      required
-                    >
-                      <option value="" disabled>Select salesman</option>
-                      {salesmen.map((s) => (
-                        <option key={s.id} value={s.id} disabled={s.isBlocked}>
-                          {s.name}{s.isBlocked ? ' (Blocked)' : ''}
-                        </option>
-                      ))}
-                    </select>
+                    <CustomSelect
+  value={salesmanId}
+  onChange={setSalesmanId}
+  options={[
+    { value: "", label: "Select salesman", isDisabled: true },
+    ...salesmen.map(s => ({
+      value: s.id,
+      label: s.name + (s.isBlocked ? " (Blocked)" : ""),
+      isDisabled: s.isBlocked
+    }))
+  ]}
+  placeholder="Select salesman"
+/>
+
                   ) : (
                     <input
                       value={salesmen.find(s => s.id === salesmanId)?.name || user?.name || ''}
@@ -350,18 +331,24 @@ console.log(quote)
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Currency</label>
-                  <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-cloud-300/50 dark:border-midnight-600/50 bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100 shadow-sm" required>
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="INR">INR - Indian Rupee</option>
-                    <option value="SAR">SAR - Saudi Riyal</option>
-                    <option value="AED">AED - UAE Dirham</option>
-                    <option value="QAR">QAR - Qatari Riyal</option>
-                    <option value="KWD">KWD - Kuwaiti Dinar</option>
-                    <option value="BHD">BHD - Bahraini Dinar</option>
-                    <option value="OMR">OMR - Omani Rial</option>
+                 
+               <CustomSelect
+  label="Currency"
+  value={currency}
+  onChange={setCurrency}
+  options={[
+    { value: "USD", label: "USD - US Dollar" },
+    { value: "INR", label: "INR - Indian Rupee" },
+    { value: "SAR", label: "SAR - Saudi Riyal" },
+    { value: "AED", label: "AED - UAE Dirham" },
+    { value: "QAR", label: "QAR - Qatari Riyal" },
+    { value: "KWD", label: "KWD - Kuwaiti Dinar" },
+    { value: "BHD", label: "BHD - Bahraini Dinar" },
+    { value: "OMR", label: "OMR - Omani Rial" }
+  ]}
+  placeholder="Select currency"
+/>
 
-                  </select>
                 </div>
 
                 {canViewSharePercent && (
@@ -390,16 +377,22 @@ console.log(quote)
 
                   <div>
                     <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Contact Person</label>
-                    <select className="w-full h-11 px-4 rounded-xl border ..." value={contactId ?? ""}
-                      onChange={(e) => {
-                        const selectedContact = contacts.find(c => c.id === e.target.value);
-                        if (selectedContact) autofillContactFields(selectedContact);
-                      }}>
-                      <option value="" disabled>Select Contact</option>
-                      {contacts.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                  <CustomSelect
+  value={contactId ?? ""}
+  onChange={val => {
+    const selectedContact = contacts.find(c => c.id === val);
+    if (selectedContact) autofillContactFields(selectedContact);
+  }}
+  options={[
+    { value: "", label: "Select Contact", isDisabled: true },
+    ...contacts.map(c => ({
+      value: c.id,
+      label: c.name
+    }))
+  ]}
+  placeholder="Select contact"
+/>
+
                   </div>
 
                   <div>
@@ -484,17 +477,19 @@ console.log(quote)
 
 
                 <div className="space-y-2 w-[30%]">
-                  <label className="block text-sm font-semibold text-midnight-800/90">Discount</label>
+                  <label className="block text-sm font-semibold text-midnight-800/90">Discount Mode</label>
 
                   <div className="flex items-center gap-3  rounded-xl ">
-                    <select className="w-1/2 h-10 rounded-lg px-2 
-                            bg-white/70 border border-cloud-400/50 
-                            text-sm text-midnight-700 
-                            focus:ring-2 focus:ring-sky-300/40 focus:border-sky-400
-                            outline-none transition-all" value={discountMode} onChange={(e) => setDiscountMode(e.target.value as "PERCENT" | "AMOUNT")}>
-                      <option value="PERCENT">Percent (%)</option>
-                      <option value="AMOUNT">Amount</option>
-                    </select>
+                    <CustomSelect
+  value={discountMode}
+  onChange={val => setDiscountMode(val as "PERCENT" | "AMOUNT")}
+  options={[
+    { value: "PERCENT", label: "Percent" },
+    { value: "AMOUNT", label: "Amount" }
+  ]}
+  placeholder="Select discount mode"
+/>
+
                     <input type="number" value={discountValue} onChange={(e) => setDiscountValue(Number(e.target.value))} className="flex-1 h-10 rounded-lg px-3
                           bg-white/70 border border-cloud-400/50 
                           text-sm text-midnight-700 

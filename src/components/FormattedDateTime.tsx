@@ -19,11 +19,11 @@ const FormattedDateTime: React.FC<FormattedDateTimeProps> = ({ isoString, classN
       day: 'numeric',
     });
 
-    // --- MODIFIED ---: Added hour12: true to show AM/PM
+  
     const formattedTime = date.toLocaleTimeString(undefined, {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true, // This ensures AM/PM is displayed
+      hour12: true, 
     });
 
     return (

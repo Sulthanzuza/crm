@@ -8,7 +8,7 @@ interface MemberTargetGaugeProps {
   isAchieved: boolean;
 }
 
-const CIRCUMFERENCE = 2 * Math.PI * 45; // 2πr for r=45
+const CIRCUMFERENCE = 2 * Math.PI * 45; 
 
 const MemberTargetGauge: React.FC<MemberTargetGaugeProps> = ({
   name,

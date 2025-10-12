@@ -1,4 +1,3 @@
-// src/pages/VendorFormPage.tsx
 
 import React, { useState, useEffect, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -10,6 +9,7 @@ import Button from '../components/Button';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { X } from "lucide-react";
 import { toast } from 'react-hot-toast';
+import CustomSelect from '../components/CustomSelect';
 interface Member { id: string; name: string; isBlocked: boolean; }
 
 const VendorFormPage: React.FC = () => {
@@ -45,7 +45,7 @@ const VendorFormPage: React.FC = () => {
           setVendor(res.vendor);
           setContacts(res.vendor.contacts.length > 0 ? res.vendor.contacts : [{ name: '' }]);
         } else {
-          // MODIFICATION: Set assignedTo based on role
+         
           setVendor({ status: 'Active', assignedTo: isAdmin ? '' : user?.id });
           setContacts([{ name: '' }]);
         }
@@ -79,11 +79,10 @@ const VendorFormPage: React.FC = () => {
    
       if (!vendor.vendorName?.trim()) {
         toast.error('Vendor Name is a required field.');
-        setActiveTab('basic'); // Switch to the relevant tab
+        setActiveTab('basic'); 
         return;
     }
 
-    // 2. Vendor Contact Info Format Validation
     if (vendor.phone && !/^\+?[0-9]{7,15}$/.test(vendor.phone.trim())) {
         toast.error('Please enter a valid phone number for the vendor.');
         setActiveTab('basic');
@@ -95,7 +94,7 @@ const VendorFormPage: React.FC = () => {
         return;
     }
 
-    // 3. Contacts Validation
+   
     const validContacts = contacts.filter(c => c && c.name?.trim());
 
     if (validContacts.length === 0) {
@@ -162,7 +161,7 @@ return (
 
     <div className="flex-1 overflow-y-auto h-screen">
       <main className="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+ 
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-midnight-800 dark:text-ivory-100">
             {isEditMode ? "Edit Vendor" : "Create New Vendor"}
@@ -210,23 +209,15 @@ return (
 
               {/* Status */}
               <div>
-                <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={vendor.status || "Active"}
-                  onChange={handleChange}
-                  className="w-full h-11 px-4 rounded-xl border border-cloud-200/50 dark:border-midnight-600/50
-                             bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100
-                             shadow-sm focus:border-sky-400 focus:ring-2 focus:ring-sky-300/50 transition"
-                >
-                  {(["Active", "Inactive", "OnHold", "Blacklisted"] as VendorStatus[]).map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+               
+               <CustomSelect
+  label="Status"
+  value={vendor.status || "Active"}
+  onChange={val => handleChange({ target: { name: "status", value: val } })}
+  options={["Active", "Inactive", "OnHold", "Blacklisted"].map(s => ({ value: s, label: s }))}
+  placeholder="Select Status"
+/>
+
               </div>
 
               {/* Email */}
@@ -305,21 +296,21 @@ return (
     Assign To
   </label>
   {isAdmin ? (
-    <select
-      name="assignedTo"
-      value={vendor.assignedTo || ""}
-      onChange={handleChange}
-      className="w-full h-11 px-4 rounded-xl border border-cloud-200/50 dark:border-midnight-600/50
-                 bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100
-                 shadow-sm focus:border-sky-400 focus:ring-2 focus:ring-sky-300/50 transition"
-    >
-      <option value="" disabled>-- Select a Member --</option>
-      {members.map((m) => (
-        <option key={m.id} value={m.id} disabled={m.isBlocked}>
-          {m.name}{m.isBlocked ? ' (Blocked)' : ''}
-        </option>
-      ))}
-    </select>
+   <CustomSelect
+  
+  value={vendor.assignedTo || ""}
+  onChange={val => handleChange({ target: { name: "assignedTo", value: val } })}
+  options={[
+    { value: "", label: "-- Select a Member --", isDisabled: true },
+    ...members.map(m => ({
+      value: m.id,
+      label: m.name + (m.isBlocked ? " (Blocked)" : ""),
+      isDisabled: m.isBlocked
+    }))
+  ]}
+  placeholder="Select Member"
+/>
+
   ) : (
     <input
       readOnly
@@ -453,26 +444,18 @@ return (
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">
-                  Category
-                </label>
-                <select
-                  name="category"
-                  value={vendor.category || ""}
-                  onChange={handleChange}
-                  className="w-full h-11 px-4 rounded-xl border border-cloud-200/50 dark:border-midnight-600/50
-                             bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100
-                             shadow-sm focus:border-sky-400 focus:ring-2 focus:ring-sky-300/50 transition"
-                >
-                  <option value="">Select Category</option>
-                  {(["Manufacturer", "Distributor", "Service Provider", "Other"] as VendorCategory[]).map(
-                    (cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    )
-                  )}
-                </select>
+                
+                <CustomSelect
+  label="Category"
+  value={vendor.category || ""}
+  onChange={val => handleChange({ target: { name: "category", value: val } })}
+  options={[
+    { value: "", label: "Select Category", isDisabled: true },
+    ...["Manufacturer", "Distributor", "Service Provider", "Other"].map(cat => ({ value: cat, label: cat }))
+  ]}
+  placeholder="Select Category"
+/>
+
               </div>
 
               {/* <div>

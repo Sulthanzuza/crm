@@ -1,17 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { authenticateToken } = require('../middleware/auth'); // Your auth middleware
+const { authenticateToken } = require('../middleware/auth');
 const Admin = require('../models/Admin');
 const Member = require('../models/Member');
 
-/**
- * @route   GET /api/layout
- * @desc    Get dashboard layout for the authenticated user (Admin or Member)
- * @access  Private
- */
+
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        const { subjectId, role } = req; // Assuming authenticateToken adds role ('admin' or 'member')
+        const { subjectId, role } = req; 
         let user;
 
         if (role === 'admin') {
@@ -31,11 +27,7 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
-/**
- * @route   PUT /api/layout
- * @desc    Save dashboard layout for the authenticated user (Admin or Member)
- * @access  Private
- */
+
 router.put('/', authenticateToken, async (req, res) => {
     const { layout } = req.body;
     if (!layout) {

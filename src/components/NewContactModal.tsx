@@ -8,8 +8,8 @@ import {  toast } from 'react-hot-toast';
 type Props = {
   open: boolean;
   onClose: () => void;
-  customerId: string;        // UUID per model change
-  onCreated: () => void;       // callback to refresh and reselect
+  customerId: string;       
+  onCreated: () => void;       
 };
 
 
@@ -20,7 +20,7 @@ const NewContactModal: React.FC<Props> = ({ open, onClose, customerId, onCreated
   const [mobile, setMobile] = useState('');
   const [fax, setFax] = useState('');
   const [email, setEmail] = useState('');
-  // New fields
+  
   const [department, setDepartment] = useState('');
   const [social, setSocial] = useState('');
 
@@ -109,8 +109,7 @@ const NewContactModal: React.FC<Props> = ({ open, onClose, customerId, onCreated
       title="New Customer Contact"
       footer={
         <>
-          {/* <Button variant="secondary" onClick={onClose}>Cancel</Button> */}
-          {/* UPDATED: Disable button if mandatory fields are missing */}
+       
           <Button onClick={save} disabled={saving || !name.trim() || !designation.trim() || !mobile.trim()}>
             {saving ? 'Saving...' : 'Create'}
           </Button>

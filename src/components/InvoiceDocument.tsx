@@ -51,14 +51,14 @@ const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({ invoice }) => (
             <Text style={[styles.tableCell, { width: '40%' }]}>{item.product}</Text>
             <Text style={[styles.tableCell, styles.textRight, { width: '10%' }]}>{item.quantity}</Text>
             <Text style={[styles.tableCell, styles.textRight, { width: '15%' }]}>${Number(item.itemRate).toFixed(2)}</Text>
-            {/* Added Tax Column */}
+            
             <Text style={[styles.tableCell, styles.textRight, { width: '15%' }]}>${Number(item.taxAmount || 0).toFixed(2)}</Text>
             <Text style={[styles.tableCell, styles.textRight, { width: '20%' }]}>${Number(item.lineTotal).toFixed(2)}</Text>
           </View>
         ))}
       </View>
 
-      {/* --- TOTALS SECTION (UPDATED LABELS) --- */}
+      
       <View style={styles.totalsContainer}>
         <View style={styles.totalsTable}>
           <View style={styles.totalsRow}>

@@ -88,17 +88,17 @@ quoteId: {
   },
    paidAt: {
     type: DataTypes.DATE,
-    allowNull: true // It's null until the invoice is paid
+    allowNull: true 
   },
    termsAndConditions: {
     type: DataTypes.TEXT,
     allowNull: true
   },
-   quoteId: { // This field is the foreign key for the Quote
+   quoteId: { 
     type: DataTypes.UUID,
     allowNull: true,
     references: {
-      model: 'quotes', // This should match the table name of the Quote model
+      model: 'quotes', 
       key: 'id'
     }
   },
@@ -108,7 +108,7 @@ quoteId: {
     comment: 'Polymorphic foreign key to the user (Admin or Member) who created the invoice.'
   },
   creatorType: {
-    type: DataTypes.STRING, // Use STRING to store 'ADMIN' or 'MEMBER'
+    type: DataTypes.STRING, 
     allowNull: false,
     comment: 'The type of the creator, e.g., "ADMIN" or "MEMBER".'
   },

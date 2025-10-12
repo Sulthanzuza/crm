@@ -7,7 +7,7 @@ import Button from '../components/Button';
 import DataTable from '../components/DataTable';
 import ConfirmDialog from '../components/ConfirmDialog';
 import FormattedDateTime from '../components/FormattedDateTime';
-import { Filter } from '../components/FilterDropdown'; // Make sure this path is correct
+import { Filter } from '../components/FilterDropdown'; 
 
 import { useAuth } from '../contexts/AuthContext';
 import { customerService, Customer } from '../services/customerService';
@@ -17,23 +17,23 @@ const Customers: React.FC = () => {
     const isAdmin = user?.type === 'ADMIN';
     const navigate = useNavigate();
 
-    // State for the full, unfiltered list of customers
+  
     const [masterItems, setMasterItems] = useState<Customer[]>([]);
-    // State for the items to be displayed in the table (after filtering)
+    
     const [items, setItems] = useState<Customer[]>([]);
     
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     
-    // State for delete confirmation
+    
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [targetId, setTargetId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
-    // Single state to hold all applied filters
+   
     const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
-    // This effect handles the initial fetching of all customer data.
+    
     useEffect(() => {
         if (!token) return;
 
@@ -44,12 +44,12 @@ const Customers: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                // Initial fetch gets ALL customers without any filters
+                
                 const res = await customerService.list(token, [], signal);
                 if (!signal.aborted) {
                     setMasterItems(res.customers);
-                    console.log(res.customers)
-                    setItems(res.customers); // Initially, displayed items are all items
+                   
+                    setItems(res.customers);
                 }
             } catch (e: any) {
                 if (!signal.aborted) {
@@ -67,14 +67,13 @@ const Customers: React.FC = () => {
         return () => controller.abort();
     }, [token]);
 
-    // This effect applies the filters to the master list whenever `appliedFilters` changes.
     useEffect(() => {
         let filtered = [...masterItems];
 
         appliedFilters.forEach(filter => {
             if (filter.values.length > 0) {
                 filtered = filtered.filter(item => {
-                    const key = filter.type.toLowerCase(); // 'Industry' -> 'industry'
+                    const key = filter.type.toLowerCase();
                     const itemValue = key === 'salesman' ? item.salesman?.name : (item as any)[key];
                     return itemValue && filter.values.includes(itemValue);
                 });
@@ -85,14 +84,13 @@ const Customers: React.FC = () => {
     }, [appliedFilters, masterItems]);
 
 
-    // Dynamically generate options from the MASTER list, so they never disappear.
     const filterOptions = useMemo(() => ({
         Industry: [...new Set(masterItems.map(item => item.industry).filter(Boolean))],
         Category: [...new Set(masterItems.map(item => item.category).filter(Boolean))],
         ...(isAdmin && { Salesman: [...new Set(masterItems.map(item => item.salesman?.name).filter(Boolean))] }),
     }), [masterItems, isAdmin]);
 
-    // Handlers for delete actions
+   
     const askDelete = (id: string) => { setTargetId(id); setConfirmOpen(true); };
     const onCancelDelete = () => { setConfirmOpen(false); setTargetId(null); };
 
@@ -101,7 +99,7 @@ const Customers: React.FC = () => {
         setDeleting(true);
         try {
             await customerService.remove(targetId, token);
-            // Remove from both master and displayed lists
+            
             setMasterItems(prev => prev.filter(c => c.id !== targetId));
             setItems(prev => prev.filter(c => c.id !== targetId));
         } catch (e: any) {
@@ -118,7 +116,7 @@ const Customers: React.FC = () => {
             <Sidebar />
             <div className="flex-1 overflow-y-auto h-screen">
                 <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
+                  
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-900 dark:text-ivory-200">Customers</h1>
@@ -137,7 +135,7 @@ const Customers: React.FC = () => {
 
                     {!loading && !error && (
                         <DataTable
-                            rows={items} // Display the filtered items
+                            rows={items} 
                             columns={[
                                 { key: 'companyName', header: 'Company' },
                                 { key: 'industry', header: 'Industry' },

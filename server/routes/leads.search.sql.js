@@ -7,11 +7,7 @@ const { Op } = require('sequelize');
 
 const router = express.Router();
 
-/**
- * GET /search
- * Search leads by number or customer company name with pagination.
- * Returns list of leads with key details.
- */
+
 router.get('/search', authenticateToken, async (req, res) => {
   try {
     const q = String(req.query.query || '').trim();
@@ -31,15 +27,15 @@ router.get('/search', authenticateToken, async (req, res) => {
       { model: Member, as: 'salesman', attributes: ['id', 'name', 'email'] },
     ];
 
-    // Use findAndCountAll for pagination & total count
+    
     const { rows, count } = await Lead.findAndCountAll({
       where,
       include,
       order: [['createdAt', 'DESC']],
       offset: (page - 1) * pageSize,
       limit: pageSize,
-      distinct: true, // avoids count duplication with joins
-      // Uncomment 'subQuery: false' if pagination behaves incorrectly with your DB dialect
+      distinct: true, 
+      
     });
 
     const leads = rows.map(l => ({

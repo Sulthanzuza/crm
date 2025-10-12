@@ -7,7 +7,7 @@ import { leadsService, Lead } from '../services/leadsService';
 import { customerService } from '../services/customerService';
 import { teamService, TeamUser } from '../services/teamService';
 import { toast } from 'react-hot-toast';
-
+import CustomSelect from '../components/CustomSelect';
 const STAGES = ['Discover', 'Solution Validation', 'Quote Negotiation', 'Closed Won', 'Closed Lost', 'Fake Lead'] as const;
 const FORECASTS = ['Pipeline', 'BestCase', 'Commit'] as const;
 const SOURCES = ['Website', 'Referral', 'Advertisement', 'Event', 'Cold Call', 'Other'] as const;
@@ -23,11 +23,11 @@ const EditLead: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    // Master data
+    
     const [customers, setCustomers] = useState<{ id: string; companyName: string }[]>([]);
     const [salesmen, setSalesmen] = useState<TeamUser[]>([]);
 
-    // Controlled form fields
+    
     const [stage, setStage] = useState<typeof STAGES[number]>('Discover');
     const [forecastCategory, setForecastCategory] = useState<typeof FORECASTS[number]>('Pipeline');
     const [customerId, setCustomerId] = useState('');
@@ -48,12 +48,12 @@ const EditLead: React.FC = () => {
     const [accompanySalesman, setAccompanySalesman] = useState(false);
     const [accompaniedMemberId, setAccompaniedMemberId] = useState('');
 
-    // UI Refs
+    
     const stageContainerRef = useRef<HTMLDivElement>(null);
     const stageButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const [indicatorStyle, setIndicatorStyle] = useState({});
 
-    // THIS IS THE CORRECTED FUNCTION
+   
     const loadLeadData = async () => {
         if (!id || !token) return;
         setLoading(true);
@@ -69,17 +69,17 @@ const EditLead: React.FC = () => {
             setCustomers(custs.customers.map(c => ({ id: c.id, companyName: c.companyName })));
             setSalesmen(team.users);
 
-            // --- FIX: Check `sharedWith` array instead of `shares` ---
+            
             if (currentLead.sharedWith && currentLead.sharedWith.length > 0) {
                 const currentShare = currentLead.sharedWith[0];
-                if (currentShare.id) { // Check if the shared member has an ID
+                if (currentShare.id) { 
                     setIsAlreadyShared(true);
                     setAccompanySalesman(true);
                     setAccompaniedMemberId(currentShare.id);
                 }
             }
 
-            // Set the rest of the form state
+         
             setStage(currentLead.stage);
             setForecastCategory(currentLead.forecastCategory);
             setCustomerId(currentLead.customerId || '');
@@ -136,7 +136,7 @@ const EditLead: React.FC = () => {
                 stage, forecastCategory, source, contactPerson, mobile, mobileAlt,
                 email: emailField, city, country, address, description, closingDate: closingDate || null
             };
-            if (stage === 'Deal Lost') payload.lostReason = lostReason;
+            if (stage === 'Closed Lost') payload.lostReason = lostReason;
             if (isAdmin) {
                 payload.customerId = customerId || undefined;
                 payload.salesmanId = salesmanId || undefined;
@@ -232,10 +232,15 @@ const EditLead: React.FC = () => {
                                 <input type="date" value={closingDate} onChange={e => setClosingDate(e.target.value)} className="w-full h-10 px-3 rounded-xl border" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-2">Source</label>
-                                <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full h-10 px-3 rounded-xl border">
-                                    {SOURCES.map((s) => <option key={s}>{s}</option>)}
-                                </select>
+                               
+                              <CustomSelect
+  label="Source"
+  value={source}
+  onChange={setSource}
+  options={SOURCES.map(s => ({ value: s, label: s }))}
+  placeholder="Select Source"
+/>
+
                             </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -246,12 +251,21 @@ const EditLead: React.FC = () => {
                             <div>
                                 <label className="block text-sm font-medium mb-2">Salesman</label>
                                 {isAdmin ? (
-                                    <select value={salesmanId} onChange={e => setSalesmanId(e.target.value)} className="w-full h-10 px-3 rounded-xl border" required>
-                                        <option value="">-- Select Salesman --</option>
-                                        {salesmen.map((s) => (
-                                            <option key={s.id} value={s.id} disabled={s.isBlocked}>{s.name} {s.isBlocked ? '(Blocked)' : ''}</option>
-                                        ))}
-                                    </select>
+                                  <CustomSelect
+  
+  value={salesmanId}
+  onChange={setSalesmanId}
+  options={[
+    { value: "", label: "-- Select Salesman --", isDisabled: true },
+    ...salesmen.map(s => ({
+      value: s.id,
+      label: s.name + (s.isBlocked ? " (Blocked)" : ""),
+      isDisabled: s.isBlocked,
+    }))
+  ]}
+  placeholder="Select Salesman"
+/>
+
                                 ) : (
                                     <input value={lead?.salesman?.name || ''} disabled className="w-full h-10 px-3 rounded-xl border" />
                                 )}
@@ -285,7 +299,7 @@ const EditLead: React.FC = () => {
                             <label className="block text-sm font-medium mb-2">Description / Notes</label>
                             <textarea value={description} onChange={e => setDescription(e.target.value)} rows={4} className="w-full px-3 py-2 rounded-xl border" />
                         </div>
-                        {stage === 'Deal Lost' && (
+                        {stage === 'Closed Lost' && (
                             <div>
                                 <label className="block text-sm font-medium mb-2">Lost Reason</label>
                                 <input value={lostReason} onChange={e => setLostReason(e.target.value)} className="w-full h-10 px-3 rounded-xl border" placeholder="Reason for losing the deal" />
@@ -320,18 +334,21 @@ const EditLead: React.FC = () => {
                                         </div>
                                         {accompanySalesman && (
                                             <div className="border-t pt-4">
-                                                <label className="block text-sm font-medium mb-1">Select Member to Accompany</label>
-                                                <select
-                                                    value={accompaniedMemberId}
-                                                    onChange={e => setAccompaniedMemberId(e.target.value)}
-                                                    required={accompanySalesman}
-                                                    className="w-full sm:w-1/2 h-10 px-3 rounded-xl border"
-                                                >
-                                                    <option value="" disabled>-- Select Member --</option>
-                                                    {availableForAccompaniment.map(s => (
-                                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                                    ))}
-                                                </select>
+                                                
+                                              <CustomSelect
+  label="Accompanied Member"
+  value={accompaniedMemberId}
+  onChange={setAccompaniedMemberId}
+  options={[
+    { value: "", label: "-- Select Member --", isDisabled: true },
+    ...availableForAccompaniment.map(s => ({
+      value: s.id,
+      label: s.name,
+    }))
+  ]}
+  placeholder="Select Member"
+/>
+
                                             </div>
                                         )}
                                     </>

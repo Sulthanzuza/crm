@@ -1,4 +1,4 @@
-// utils/otp.sql.js
+
 const bcrypt = require('bcryptjs');
 const { Op } = require('sequelize');
 const Otp = require('../models/Otp');
@@ -16,9 +16,9 @@ async function verifyCode(code, codeHash) {
   return bcrypt.compare(code, codeHash);
 }
 
-// Create or update an OTP for a subject/purpose, invalidating prior active ones
+
 async function createOrUpdateOtp(subjectType, subjectId, purpose) {
-  // Invalidate prior active
+
   await Otp.update(
     { isUsed: true },
     { where: { subjectType, subjectId, purpose, isUsed: false } }
@@ -27,8 +27,8 @@ async function createOrUpdateOtp(subjectType, subjectId, purpose) {
   const code = generateOTP();
   const codeHash = await hashCode(code);
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 10 min
-  const resendAfter = new Date(now.getTime() + 60 * 1000);     // 60 sec
+  const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); 
+  const resendAfter = new Date(now.getTime() + 60 * 1000);    
 
   const rec = await Otp.create({
     subjectType,
@@ -45,7 +45,7 @@ async function createOrUpdateOtp(subjectType, subjectId, purpose) {
   return { code, record: rec };
 }
 
-// Cooldown check before resending OTP
+
 async function canResend(subjectType, subjectId, purpose) {
   const current = await Otp.findOne({
     where: { subjectType, subjectId, purpose, isUsed: false },
@@ -56,8 +56,7 @@ async function canResend(subjectType, subjectId, purpose) {
   return now >= current.resendAfter;
 }
 
-// Verify and consume an OTP
-// Returns { ok: boolean, reason?: 'EXPIRED' | 'MAX_ATTEMPTS' | 'INVALID' }
+
 async function verifyOtp(subjectType, subjectId, purpose, code) {
   const rec = await Otp.findOne({
     where: { subjectType, subjectId, purpose, isUsed: false },

@@ -12,23 +12,21 @@ const Member = require('../models/Member');
 
 const router = express.Router();
 
-// --- LIST ALL VENDORS (Corrected and Final) ---
+
 router.get('/', authenticateToken, async (req, res) => {
     try {
         const { search, status, category, industry, sortBy = 'vendorName', order = 'ASC' } = req.query;
         const where = {};
 
-        // **FIX 1: Use req.subjectType for Role-Based Filtering**
-        // If the user is not an admin, only show vendors assigned to them.
+      
         if (req.subjectType !== 'ADMIN') {
             where.assignedTo = req.subjectId;
         }
 
-        // **FIX 2: Handle Search and use correct operator for MySQL**
-        // This prevents 'undefined' from entering the query.
+        
         if (search && typeof search === 'string' && search.trim() !== '' && search.trim() !== 'undefined') {
             const searchQuery = `%${search.trim()}%`;
-            // Use Op.like for MySQL. It is case-insensitive by default in most standard collations.
+           
             where[Op.or] = [
                 { vendorName: { [Op.like]: searchQuery } },
                 { email: { [Op.like]: searchQuery } },
@@ -36,8 +34,7 @@ router.get('/', authenticateToken, async (req, res) => {
             ];
         }
 
-        // Add other filters if they are provided
-        if (status) where.status = status;
+ if (status) where.status = status;
         if (category) where.category = category;
         if (industry) where.industry = industry;
 
@@ -57,7 +54,7 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
-// --- GET A SINGLE VENDOR BY ID ---
+
 router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const vendor = await Vendor.findByPk(req.params.id, {
@@ -67,7 +64,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, message: 'Vendor not found' });
         }
 
-        // **FIX: Use req.subjectType for authorization check**
+        
         if (req.subjectType !== 'ADMIN' && vendor.assignedTo !== req.subjectId) {
             return res.status(403).json({ success: false, message: 'Forbidden' });
         }
@@ -77,84 +74,6 @@ router.get('/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
-
-// router.post('/', authenticateToken, [
-//     // --- Validations ---
-//     body('vendorName').trim().notEmpty().withMessage('Vendor name is required'),
-//     body('email').optional({ checkFalsy: true }).isEmail().withMessage('Please provide a valid email address'),
-//     body('website').optional({ checkFalsy: true }).isURL().withMessage('Please provide a valid website URL'),
-//     body('contacts').optional().isArray().withMessage('Contacts must be an array')
-//   ],
-//   async (req, res) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ success: false, errors: errors.array() });
-//     }
-
-//     const transaction = await sequelize.transaction();
-
-//     try {
-//       const { contacts = [], ...vendorData } = req.body;
-
-//       // --- Logic for Ownership and Primary Contact ---
-
-//       // 1. Determine who the vendor is assigned to
-//       let assignedToId = (req.subjectType === 'ADMIN' && vendorData.assignedTo)
-//         ? vendorData.assignedTo
-//         : req.subjectId;
-
-//       // 2. Intelligently set the primary contact person's name
-//       const primaryContactName = (contacts.length > 0 && contacts[0].name)
-//         ? contacts[0].name
-//         : vendorData.vendorName;
-
-//       // --- Database Operations ---
-
-//       // 3. Create the main Vendor record within the transaction
-//       const vendor = await Vendor.create({
-//         ...vendorData,
-//         contactPerson: primaryContactName, // Guaranteed to have a value
-//         assignedTo: assignedToId,
-//       }, { transaction });
-
-//       // 4. If contacts were provided, create them in bulk
-//       if (contacts.length > 0) {
-//         const contactPayload = contacts
-//           .filter(c => c && c.name) // Ensure contact has a name
-//           .map(c => ({
-//             ...c,
-//             id: undefined, // Let the DB generate the ID
-//             vendorId: vendor.id // Link to the newly created vendor
-//           }));
-        
-//         if (contactPayload.length > 0) {
-//           await VendorContact.bulkCreate(contactPayload, { transaction });
-//         }
-//       }
-
-//       // 5. Commit the transaction if all operations were successful
-//       await transaction.commit();
-
-//       // --- Final Response ---
-
-//       // 6. Fetch the complete vendor object with all its associations
-//       const newVendor = await Vendor.findByPk(vendor.id, {
-//         include: [
-//           { association: 'assignedMember' }, // Assuming 'assignedMember' is the alias for the Member model
-//           { association: 'contacts' }        // Assuming 'contacts' is the alias for the VendorContact model
-//         ]
-//       });
-
-//       res.status(201).json({ success: true, vendor: newVendor });
-
-//     } catch (error) {
-//       // If any error occurred, roll back the transaction
-//       await transaction.rollback();
-//       console.error('Create Vendor Error:', error);
-//       res.status(500).json({ success: false, message: 'Failed to create vendor.' });
-//     }
-//   }
-// );
 
 
 router.post('/', authenticateToken, [
@@ -173,14 +92,14 @@ router.post('/', authenticateToken, [
     try {
         const { contacts = [], ...vendorData } = req.body;
 
-        // 1. Determine who the vendor is assigned to
+       
         let assignedToId;
         let assignedMember = null;
         const isAdminRequest = req.subjectType === 'ADMIN';
 
         if (isAdminRequest && vendorData.assignedTo) {
             assignedToId = vendorData.assignedTo;
-            // Fetch the member to get their email for the notification
+        
             assignedMember = await Member.findByPk(assignedToId);
             if (!assignedMember) {
                 await transaction.rollback();
@@ -190,19 +109,19 @@ router.post('/', authenticateToken, [
             assignedToId = req.subjectId;
         }
 
-        // 2. Intelligently set the primary contact person's name
+       
         const primaryContactName = (contacts.length > 0 && contacts[0].name)
             ? contacts[0].name
             : vendorData.vendorName;
 
-        // 3. Create the main Vendor record
+        
         const vendor = await Vendor.create({
             ...vendorData,
             contactPerson: primaryContactName,
             assignedTo: assignedToId,
         }, { transaction });
 
-        // 4. Create associated contacts if provided
+     
         if (contacts.length > 0) {
             const contactPayload = contacts
                 .filter(c => c && c.name)
@@ -213,17 +132,16 @@ router.post('/', authenticateToken, [
             }
         }
 
-        // --- EMAIL NOTIFICATION LOGIC ---
-        // If an admin created this and assigned it to another member, send an email.
+        
         if (isAdminRequest && assignedMember && assignedMember.id !== req.subjectId) {
-            // **Send the email notification**
+          
             await notifyAssignment(assignedMember, 'Vendor', vendor);
         }
 
-        // 5. Commit the transaction
+        
         await transaction.commit();
 
-        // 6. Fetch and return the complete new vendor object
+       
         const newVendor = await Vendor.findByPk(vendor.id, {
             include: [{ association: 'assignedMember' }, { association: 'contacts' }]
         });
@@ -246,14 +164,14 @@ router.put('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ success: false, message: 'Vendor not found' });
         }
 
-        // **FIX: Use req.subjectType for authorization check**
+      
         if (req.subjectType !== 'ADMIN' && vendor.assignedTo !== req.subjectId) {
             await transaction.rollback();
             return res.status(403).json({ success: false, message: 'Forbidden' });
         }
 
         const { contacts, ...vendorData } = req.body;
-        // Prevent non-admins from changing assignment
+      
         if (req.subjectType !== 'ADMIN') {
             delete vendorData.assignedTo;
         }

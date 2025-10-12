@@ -26,7 +26,7 @@ interface SelectContactModalProps {
 const SelectContactModal: React.FC<SelectContactModalProps> = ({ open, onClose, onSelect }) => {
   const { token } = useAuth();
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounced(query, 300); // 300ms debounce delay
+  const debouncedQuery = useDebounced(query, 300);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +37,7 @@ const SelectContactModal: React.FC<SelectContactModalProps> = ({ open, onClose, 
     }
 
     setLoading(true);
-    // Use the correct service function
+  
     contactsService.searchCompanies(token, debouncedQuery)
       .then(res => {
         if (res.success) {

@@ -1,4 +1,4 @@
-// server.js
+
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
@@ -31,7 +31,7 @@ const dashboardRouter= require('./routes/dashboard.sql')
 const targetRoutes = require('./routes/targets');
 const layoutRoutes= require('./routes/layout')
 const Counter = require('./models/Counter');
-// CORS for API
+
 const allowedOrigins = [
   process.env.FRONTEND_ORIGIN,      
   process.env.FRONTEND_ORIGIN_PROD,  
@@ -53,7 +53,7 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-//newly added for attachments
+
 app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 
 
@@ -71,7 +71,7 @@ async function seedAdmins() {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(it.password, salt);
       await Admin.create({ name: it.name, email: it.email, password: hash, isVerified: true });
-      console.log('Seeded admin', it.email);
+      
     }
   }
 }
@@ -82,7 +82,7 @@ async function seedAdmins() {
     await connectDB();
     if (process.env.DB_SYNC === 'true') {
     //await sequelize.sync({ alter: true });
-      console.log('Sequelize synced');
+    
     }
     await seedAdmins();
 const [counter, created] = await Counter.findOrCreate({
@@ -90,18 +90,18 @@ const [counter, created] = await Counter.findOrCreate({
       defaults: { currentValue: 1000 }
     });
     if (created) {
-      console.log(' "leadNumber" counter has been initialized.');
+     
     }
     const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-    // Socket.IO with CORS matching the frontend and auth via handshake.auth
+    
     const io = new Server(server, {
       cors: { origin: allowedOrigins, credentials: true },
       path: '/socket.io',
     });
     app.set('io', io);
 
-    // Recommended: authenticate with io.use reading socket.handshake.auth
+    
     io.use((socket, next) => {
       const token = socket.handshake?.auth?.token;
       if (!token) return next(new Error('no token'));
@@ -116,7 +116,7 @@ const [counter, created] = await Counter.findOrCreate({
     io.on('connection', (socket) => {
      
       socket.conn.on('upgrade', () => {
-        console.log('upgraded to:', socket.conn.transport.name);
+        
       });
 
       const user = socket.request?.user;
@@ -141,7 +141,7 @@ const [counter, created] = await Counter.findOrCreate({
       socket.on('disconnect', () => {});
     });
 //INSERT INTO counters (name, currentValue) VALUES ('quoteNumber', 100) ON DUPLICATE KEY UPDATE name=name; run this before saving quote
-    // Routes
+
     
     app.use('/api/auth', authRoutes);
     app.use('/api/leads', leadsRoutes);

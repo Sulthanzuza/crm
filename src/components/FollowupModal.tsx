@@ -1,4 +1,4 @@
-// components/FollowupModal.tsx
+
 import React, { useState } from 'react';
 import Button from './Button';
 import { toast } from 'react-hot-toast';
@@ -32,7 +32,7 @@ const REMINDER_OPTIONS = {
 const FollowupModal: React.FC<Props> = ({ open, onClose, onSubmit, leadNumber, salesmanName }) => {
   const [status, setStatus] = useState<typeof STATUS[number]>('Followup');
   const [description, setDescription] = useState('');
-  const [scheduledAt, setScheduledAt] = useState<string>(''); // local datetime
+  const [scheduledAt, setScheduledAt] = useState<string>(''); 
   const [scheduleReminder, setScheduleReminder] = useState<string>('');
   const [saving, setSaving] = useState(false);
 
@@ -49,7 +49,7 @@ const FollowupModal: React.FC<Props> = ({ open, onClose, onSubmit, leadNumber, s
       });
       toast.success('Follow-up added successfully');
       onClose();
-      // reset after close
+   
       setStatus('Followup');
       setDescription('');
       setScheduledAt('');
@@ -65,7 +65,7 @@ const FollowupModal: React.FC<Props> = ({ open, onClose, onSubmit, leadNumber, s
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-6">
       <div className="bg-white/30 dark:bg-midnight-900/40 backdrop-blur-xl border border-white/20 dark:border-midnight-700/30
                        w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        {/* Header */}
+       
         <div className="px-6 py-4 border-b border-white/20 dark:border-midnight-700/30 flex items-center justify-between backdrop-blur-sm">
           <h2 className="text-lg font-bold text-midnight-800 dark:text-ivory-100">Add Followup</h2>
           <button
@@ -122,7 +122,7 @@ const FollowupModal: React.FC<Props> = ({ open, onClose, onSubmit, leadNumber, s
             />
           </div>
           
-          {/* New Reminder Dropdown */}
+         
           {scheduledAt && (
             <div>
               <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">
@@ -151,7 +151,7 @@ const FollowupModal: React.FC<Props> = ({ open, onClose, onSubmit, leadNumber, s
           </div>
         </div>
 
-        {/* Footer */}
+      
         <div className="px-6 py-4 border-t border-white/20 dark:border-midnight-700/30 flex justify-end gap-4 backdrop-blur-sm">
           <Button
             variant="secondary"

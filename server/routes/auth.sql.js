@@ -1,4 +1,4 @@
-// routes/auth.sql.js
+
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -25,7 +25,7 @@ router.post('/login', [ body('email').isEmail(), body('password').isLength({ min
     if (!u) { subjectType = 'MEMBER'; u = await Member.findOne({ where: { email } }); }
     if (!u) return res.status(400).json({ success:false, message:'Invalid credentials' });
 
-    // Blocked check for members BEFORE password compare (optional to avoid timing info)
+    
     if (subjectType === 'MEMBER' && u.isBlocked) {
       return res.status(403).json({ success:false, message:'Account is blocked. Contact the administrator.' });
     }
@@ -35,7 +35,7 @@ router.post('/login', [ body('email').isEmail(), body('password').isLength({ min
  if (subjectType === 'MEMBER' && u.isDeleted) {
       return res.status(404).json({ success:false, message:'User not found' });
     }
-    // Double-check after compare as well (defense in depth if desired)
+    
     if (subjectType === 'MEMBER' && u.isBlocked) {
       return res.status(403).json({ success:false, message:'Account is blocked. Contact the administrator.' });
     }

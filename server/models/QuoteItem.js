@@ -11,22 +11,22 @@ QuoteItem.init({
   description: { type: DataTypes.TEXT, allowNull: true },
   quantity: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
   
-  // --- Fields to Perfectly Match Your Business Logic ---
   
-  // Base Input Fields
+  
+  
   unitCost: { type: DataTypes.DECIMAL(12, 2), allowNull: false },
   totalCost: { type: DataTypes.DECIMAL(14, 2), allowNull: false },
   marginPercent: { type: DataTypes.DECIMAL(5, 2), allowNull: false },
   vatPercent: { type: DataTypes.DECIMAL(5, 2), allowNull: false },
 
-  // Stored Calculated Fields
+  
   unitPrice: {
-    // Final selling price per unit, including margin.
+    
     type: DataTypes.DECIMAL(14, 2),
     allowNull: false,
   },
   totalPrice: {
-    // Final selling price for the line, including margin.
+    
     type: DataTypes.DECIMAL(14, 2),
     allowNull: false,
   },

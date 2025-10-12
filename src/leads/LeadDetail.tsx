@@ -70,7 +70,7 @@ const [downloadingId, setDownloadingId] = useState<string | null>(null);
     } catch (e: any) {
         toast.error(e?.data?.message || 'Failed to download PDF');
     }finally {
-      setDownloadingId(null); // Clear the downloading ID
+      setDownloadingId(null); 
     }
 
   };
@@ -96,18 +96,18 @@ const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
 const selectMain = async (q: Quote) => {
   const originalMainNumber = currentMain;
-  onMainChange(q.quoteNumber); // Optimistic UI update
+  onMainChange(q.quoteNumber); 
   setBusy(q.id);
 
   try {
-    // This correctly sends the string "Q-2025-..." to the backend
+  
     await quotesService.setMainQuote(leadId, q.quoteNumber, token);
     
-    // The backend will now find the quote and update the lead successfully.
+
 
   } catch (e: any) {
       toast.error(e?.data?.message || 'Failed to set main quote');
-    onMainChange(originalMainNumber || null); // Revert on failure
+    onMainChange(originalMainNumber || null); 
   } finally {
     setBusy(null);
   }
@@ -132,7 +132,7 @@ const selectMain = async (q: Quote) => {
                             ? "bg-sky-100/70 dark:bg-sky-900/40 border-sky-400"
                             : "bg-white/50 dark:bg-midnight-800/40 border-gray-300/30 hover:shadow-lg"}`}
             >
-              {/* Preview button */}
+             
               <button
                 type="button"
                 onClick={() => openPreview(q)}
@@ -143,7 +143,7 @@ const selectMain = async (q: Quote) => {
                 {q.quoteNumber}
               </button>
 
-              {/* Download */}
+              
                <button
                   type="button"
                   onClick={() => download(q)}
@@ -155,7 +155,7 @@ const selectMain = async (q: Quote) => {
                  <Download size={18} />
                 </button>
 
-              {/* Set main */}
+              
               <label className="inline-flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 ml-2">
                 <input
                   type="radio"
@@ -174,7 +174,7 @@ const selectMain = async (q: Quote) => {
         })}
       </div>
 
-      {/* Preview Modal */}
+      
       <PreviewModal
         open={preview.open}
         onClose={() => setPreview({ open: false })}
@@ -239,7 +239,7 @@ const LeadDetail: React.FC = () => {
     try {
       const res = await leadsService.getOne(id, token);
       setLead(res.lead);
-       console.log(res)
+       
     } catch (e: any) {
       toast.error(e?.data?.message || 'Failed to load lead');
     } finally {
@@ -254,7 +254,7 @@ const LeadDetail: React.FC = () => {
       const res = await api.get<{ success: boolean; followups: Followup[] }>(`/followups/${id}`, token);
       setLead(prev => prev ? ({ ...prev, followups: res.followups as any }) : prev);
     } catch {
-      // ignore
+      
     }
   };
 
@@ -273,7 +273,7 @@ const LeadDetail: React.FC = () => {
       try {
         const res = await api.get<{ success: boolean; messages: any[] }>(`/leads/${id}/chat`, token);
         setMessages(res.messages);
-      } catch { /* ignore */ }
+      } catch {  }
     })();
   }, [id, token, socket]);
 
@@ -302,7 +302,7 @@ useEffect(() => {
         if (evt.leadId !== id) return;
         setLead(prev => {
             if (!prev) return prev;
-            // CORRECTED: Use attachmentsJson
+            
             const attachments = (prev.attachmentsJson as any[]) || [];
             const exists = attachments.some(a => a.url === evt.attachment.url);
             return exists ? prev : { ...prev, attachmentsJson: [...attachments, evt.attachment] };
@@ -313,7 +313,7 @@ useEffect(() => {
         if (evt.leadId !== id) return;
         setLead(prev => prev ? ({
             ...prev,
-            // CORRECTED: Use attachmentsJson
+            
             attachmentsJson: ((prev.attachmentsJson as any[]) || []).filter(a => a.url !== evt.attachment.url)
         }) : prev);
     };
@@ -339,7 +339,6 @@ useEffect(() => {
   }, [lead?.followups]);
 
 
-  // CORRECTED LINES
   const upcoming: Followup | null = visibleFollowups.length > 0 ? visibleFollowups[0] : null;
   const others: Followup[] = visibleFollowups.length > 1 ? visibleFollowups.slice(1) : [];
 
@@ -372,7 +371,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
     if (!id || !token) return;
     try {
         await api.post<{ success: boolean }>(`/leads/${id}/attachments/delete`, { filename: att.filename, url: att.url }, token);
-        // CORRECTED: Use attachmentsJson
+        
         setLead(prev => prev ? ({
             ...prev,
             attachmentsJson: ((prev.attachmentsJson as any[]) || []).filter(a => a.url !== att.url)
@@ -442,7 +441,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
 
           {lead && (
             <>
-              {/* Header */}
+            
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h1 className="text-3xl font-bold text-midnight-900 dark:text-ivory-100 drop-shadow-lg">
@@ -469,7 +468,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                 </div>
               </div>
 
-              {/* Details */}
+             
               <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl p-5 shadow-lg mb-6">
                 <div className="text-base font-semibold text-midnight-700 dark:text-ivory-200 mb-3">
                   Lead Details
@@ -492,7 +491,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                     </div>
                   )}
 
-                  {lead.stage === 'Deal Lost' && (
+                  {lead.stage === 'Closed Lost' && (
   <div>
     <span className="font-medium text-midnight-500 dark:text-ivory-400">Lost Reason : </span> {lead.lostReason || '-'}
   </div>
@@ -514,7 +513,6 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                     </div>
                   )}
                  
-                  {/* <div><span className="font-medium text-midnight-500 dark:text-ivory-400">Creator:</span> {lead.creatorType ? `${lead.creatorType}` : '-'}</div> */}
                 </div>
                 {lead.previewUrl && (
                   <img
@@ -532,8 +530,8 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
               </div>
 
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              {/* Followups */}
-                              <div className="flex flex-col h-[400px]"> {/* set fixed height */}
+                        
+                              <div className="flex flex-col h-[400px]"> 
                                 <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl 
                                     border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl 
                                     p-5 shadow-lg mb-6 flex flex-col flex-1 overflow-hidden">
@@ -551,7 +549,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                                     </Button>
                                   </div>
               
-                                  {/* Scrollable content */}
+                                  
                                   <div className="overflow-y-auto pr-2 space-y-3 flex-1">
                                     {upcoming && (
                                       <div className="mb-4 rounded-xl border-2 border-amber-400/70 bg-amber-50/70 dark:bg-amber-900/30 p-4 shadow-sm">
@@ -582,7 +580,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                                 </div>
                               </div>
               
-                              {/* Attachments */}
+                              
                               <div className="flex flex-col h-[400px]">
                                 <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl 
                                                 border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl 
@@ -605,7 +603,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                                     </div>
                                   </div>
               
-                                  {/* Scrollable content */}
+                                  
                                   <div className="overflow-y-auto pr-2 flex-1">
                                    {lead.attachmentsJson && (lead.attachmentsJson as any[]).length > 0 ? (
     <div className="flex flex-wrap gap-3">
@@ -620,13 +618,13 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                                 </div>
                               </div>
               
-                              {/* Quotes */}
+                              
                               <div className="flex flex-col h-[400px]">
                                  <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl 
                                   border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl 
                                   p-5 shadow-lg mb-6 flex flex-col flex-1 overflow-hidden">
                     
-                    {/* --- THIS IS THE CORRECTED HEADER --- */}
+                   
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-base font-semibold text-midnight-700 dark:text-ivory-200">Quotes</div>
                       <Button
@@ -652,7 +650,7 @@ const onDeleteAttachment = async (att: { filename: string; url: string }) => {
                 
                               </div>
               
-                              {/* Logs */}
+                             
                               <div className="flex flex-col h-[400px]">
                                 <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl 
                                             border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl 

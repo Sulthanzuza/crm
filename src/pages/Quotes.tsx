@@ -7,15 +7,13 @@ import { quotesService, Quote } from '../services/quotesService';
 import { invoiceService } from '../services/invoiceService';
 import DataTable from '../components/DataTable';
 import PreviewModal from '../components/PreviewModal';
-import { Eye, Download,Check,X, File, Pen } from 'lucide-react';
+import { Eye, Download,Check,X, Copy, Pen } from 'lucide-react';
 import { Filter } from '../components/FilterDropdown';
 import FormattedDateTime from '../components/FormattedDateTime';
 import { toast } from 'react-hot-toast';
+import CustomSelect from '../components/CustomSelect';
 
-
-
-
-// --- Rejection Dialog Sub-component --- 
+ 
 const RejectDialog: React.FC<{
   open: boolean;
   onClose: () => void;
@@ -61,12 +59,10 @@ const RejectDialog: React.FC<{
   );
 };
 
-// --- Constants ---
 const memberStatuses = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired'] as const;
 const adminStatuses = ['Draft', 'Sent', 'Accepted', 'Rejected', 'Expired'] as const;
 const FINAL_STATES = ['Accepted', 'Rejected', 'Expired'];
 
-// --- Main Quotes Component ---
 const Quotes: React.FC = () => {
   const { token, user } = useAuth();
   const isAdmin = user?.type === 'ADMIN';
@@ -81,14 +77,14 @@ const Quotes: React.FC = () => {
   const [rejectFor, setRejectFor] = useState<Quote | null>(null);
   const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
-  // --- Data Fetching ---
+
   useEffect(() => {
     if (!token) return;
     (async () => {
       setLoading(true);
       try {
         const res = await quotesService.listAll(token);
-        console.log(res);
+    
         setMasterQuotes(res.quotes);
         setQuotes(res.quotes);
       } catch (e: any) {
@@ -99,7 +95,7 @@ const Quotes: React.FC = () => {
     })();
   }, [token]);
 
-  // --- Client-Side Filtering ---
+
   useEffect(() => {
     let filtered = [...masterQuotes];
     appliedFilters.forEach(filter => {
@@ -116,14 +112,13 @@ const Quotes: React.FC = () => {
     setQuotes(filtered);
   }, [appliedFilters, masterQuotes]);
 
-  // --- Memoized Filter Options ---
   const filterOptions = useMemo(() => ({
     Company: [...new Set(masterQuotes.map(q => q.customerName).filter(Boolean))],
     Status: [...new Set(masterQuotes.map(q => q.status).filter(Boolean))],
     ...(isAdmin && { Salesman: [...new Set(masterQuotes.map(q => q.salesmanName).filter(Boolean))] }),
   }), [masterQuotes, isAdmin]);
 
-  // --- PDF Download Handler ---
+
   const handleDownload = async (quote: Quote) => {
     if (!token) return;
     setPendingAction(quote.id);
@@ -145,7 +140,7 @@ const Quotes: React.FC = () => {
     }
   };
 
-  // --- Action Handlers ---
+
   const showPreview = async (quote: Quote) => {
     if (!token) return;
     setPreview({ open: true, html: '<div>Loading preview...</div>' });
@@ -224,49 +219,80 @@ const Quotes: React.FC = () => {
     }
   };
 
-  // --- Action Column Renderer (UPDATED) ---
-  const renderActions = (quote: Quote) => {
-    const status = quote.status || 'Draft';
-    const isFinal = FINAL_STATES.includes(status);
-    const isPendingApproval = status === 'PendingApproval';
-    const canDownload = quote.isApproved || isAdmin;
-    const isBusy = pendingAction === quote.id;
-    const isAccepted = status === 'Accepted';
-    const hasInvoice = !!quote.invoiceId;
 
-    return (
+const renderActions = (quote: Quote) => {
+  const status = quote.status || "Draft";
+  const isFinal = FINAL_STATES.includes(status);
+  const isPendingApproval = status === "PendingApproval";
+  const canDownload = quote.isApproved || isAdmin;
+  const isBusy = pendingAction === quote.id;
+  const isAccepted = status === "Accepted";
+  const hasInvoice = !!quote.invoiceId;
 
-      <div className="grid grid-cols-6 gap-1">
-        <div className='col-span-3 my-auto'>
+  return (
+    <div className="flex flex-wrap items-center justify-start gap-2 w-full">
+      {/* LEFT SIDE: STATUS / ACTION BUTTONS */}
+      <div className="flex flex-wrap items-center gap-2 flex-grow min-w-[200px]">
+        {isAccepted && !hasInvoice && (
+          <Button
+            size="sm"
+            variant="success"
+            onClick={() => convertToInvoice(quote)}
+            disabled={isBusy}
+            className="px-3"
+          >
+            {isBusy ? "Converting..." : "Convert to Invoice"}
+          </Button>
+        )}
 
+        {isAccepted && hasInvoice && (
+          <span className="text-xs font-semibold text-green-600 bg-green-100 rounded-full px-3 py-1 whitespace-nowrap">
+            Invoice Created
+          </span>
+        )}
 
-          {isAccepted && !hasInvoice && (
-            <Button size="sm" variant="success" onClick={() => convertToInvoice(quote)} disabled={isBusy} className='px-3'>
-              {isBusy ? 'Converting...' : 'Convert to Invoice'}
+        {!isPendingApproval && !isAccepted && (
+          <div className="min-w-[150px]">
+            <CustomSelect
+              value={status}
+              onChange={(val) => updateStatus(quote, val)}
+              options={(isAdmin ? adminStatuses : memberStatuses).map((s) => ({
+                value: s,
+                label: s,
+              }))}
+              placeholder="Select Status"
+              isDisabled={isFinal || isBusy}
+            />
+          </div>
+        )}
+
+        {isAdmin && isPendingApproval && !isFinal && (
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="success"
+              onClick={() => approveQuote(quote)}
+              disabled={isBusy}
+              className="px-3"
+            >
+              <Check />
             </Button>
-          )}
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => setRejectFor(quote)}
+              disabled={isBusy}
+              className="px-3"
+            >
+              <X />
+            </Button>
+          </div>
+        )}
+      </div>
 
-          {isAccepted && hasInvoice && (
-            <span className="text-xs font-semibold text-green-600 bg-green-100 rounded-full px-3 py-1">Invoice Created</span>
-          )}
-
-          {!isPendingApproval && !isAccepted && (
-            <select value={status} onChange={(e) => updateStatus(quote, e.target.value)} disabled={isFinal || isBusy} className="select select-bordered select-sm rounded-full">
-              {(isAdmin ? adminStatuses : memberStatuses).map(s => (<option key={s} value={s}>{s}</option>))}
-            </select>
-          )}
-
-          {isAdmin && isPendingApproval && !isFinal && (
-            <div className="flex gap-2">
-              <Button size="sm" variant="success" onClick={() => approveQuote(quote)} disabled={isBusy} className='px-3'><Check></Check></Button>
-              <Button size="sm" variant="danger" onClick={() => setRejectFor(quote)} disabled={isBusy} className="px-3"><X></X></Button>
-            </div>
-          )}
-
-        </div>
-
-        {/* MODIFICATION: Show Edit icon only for 'PendingApproval' status */}
-        {status === 'PendingApproval' && (
+      {/* RIGHT SIDE: ICON BUTTONS */}
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {status === "PendingApproval" && (
           <button
             onClick={() => navigate(`/quote/${quote.id}`)}
             disabled={isBusy}
@@ -277,7 +303,6 @@ const Quotes: React.FC = () => {
           </button>
         )}
 
-        {/* 👁 Preview Icon */}
         <button
           onClick={() => showPreview(quote)}
           disabled={isBusy}
@@ -286,7 +311,6 @@ const Quotes: React.FC = () => {
         >
           <Eye className="w-5 h-5" />
         </button>
-
 
         <button
           onClick={() => handleDownload(quote)}
@@ -297,21 +321,20 @@ const Quotes: React.FC = () => {
           <Download className="w-5 h-5" />
         </button>
 
-
-        {(status === 'Draft' || status === 'Sent') && (
+        {(status === "Draft" || status === "Sent") && (
           <button
             onClick={() => navigate(`/quote/${quote.id}/clone`)}
             disabled={isBusy}
             title="Clone Quote"
             className="p-2 text-gray-600 hover:text-sky-600 disabled:opacity-50"
           >
-            <File className="w-5 h-5" />
+            <Copy className="w-5 h-5" />
           </button>
         )}
-
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   // --- Main Component Render ---
   return (
@@ -403,7 +426,7 @@ const Quotes: React.FC = () => {
                 header: 'Actions',
                 sortable: false,
                 render: renderActions,
-                width: '300px',
+                width: '200px',
               },
             ]}
             initialSort={{ key: 'quoteDate', dir: 'DESC' }}

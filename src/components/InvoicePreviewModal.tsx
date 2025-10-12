@@ -5,7 +5,7 @@ import { Invoice } from '../services/invoiceService';
 interface InvoicePreviewModalProps {
   invoice: Invoice | null;
   onClose: () => void;
-  pdfUrl?: string; // URL or blob of generated PDF
+  pdfUrl?: string; 
   onDownload?: () => Promise<void> | void;
   downloading?: boolean;
 }
@@ -19,7 +19,7 @@ const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
 }) => {
   if (!invoice) return null;
 
-  // A4 at ~96dpi
+ 
   const A4_WIDTH = 794;
   const A4_HEIGHT = 1123;
 
@@ -27,7 +27,7 @@ const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-xl w-[95vw] max-w-[1200px] max-h-[90vh] flex flex-col">
 
-        {/* Header */}
+        
         <div className="px-4 py-2 border-b flex items-center justify-between">
           <div className="font-semibold">
             Invoice Preview: {invoice.invoiceNumber}
@@ -52,7 +52,7 @@ const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
           </div>
         </div>
 
-        {/* Content */}
+      
         <div className="flex-1 overflow-auto p-3">
           <div
             className="w-full h-full flex items-center justify-center"
@@ -82,7 +82,7 @@ const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
           </div>
         </div>
 
-        {/* Footer */}
+        
         <div className="px-4 py-2 border-t flex justify-end">
           <Button variant="secondary" onClick={onClose}>Close</Button>
         </div>

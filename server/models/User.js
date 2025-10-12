@@ -1,13 +1,7 @@
-// models/User.js
-// -------------------------------------------------
-// This file defines the Mongoose Schema and Model for a User.
 
 const mongoose = require('mongoose');
 
-/**
- * User Schema Definition.
- * This schema maps directly to a MongoDB collection named 'users'.
- */
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -16,7 +10,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Please provide an email'],
-    unique: true, // Ensures no two users can have the same email
+    unique: true, 
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       'Please provide a valid email',
@@ -47,7 +41,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
-  // New hierarchy fields
+  
   role: {
     type: String,
     enum: ['ADMIN', 'MEMBER'],
@@ -56,7 +50,7 @@ const userSchema = new mongoose.Schema({
   parent: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    default: null, // null means a top-level user (e.g., the original account owner)
+    default: null, 
     index: true,
   },
   designation: {

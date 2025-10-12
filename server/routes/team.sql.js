@@ -5,7 +5,7 @@ const { authenticateToken, isAdmin } = require('../middleware/auth');
 const Member = require('../models/Member');
 const { notifyUserCreated} = require('../utils/emailService')
 const Lead = require('../models/Lead');
-const Quote = require('../models/Quote'); // Assuming you have this model
+const Quote = require('../models/Quote'); 
 const Invoice = require('../models/Invoices');
 const { Op,fn,col } = require('sequelize');
 const router = express.Router();
@@ -97,7 +97,7 @@ router.get('/users/:id/performance', authenticateToken, async (req, res) => {
 
     const { start, end } = getDateRange(range);
 
-    // No 'amount' field in leads model, so only count by stage
+  
     const leadStagesSummary = await Lead.findAll({
       attributes: [
         'stage',
@@ -110,7 +110,7 @@ router.get('/users/:id/performance', authenticateToken, async (req, res) => {
       group: ['stage'],
     });
 
-    // Use grandTotal or totalCost field for aggregating amounts in Quotes
+    
     const quoteStatusSummary = await Quote.findAll({
       attributes: [
         'status',
@@ -124,7 +124,7 @@ router.get('/users/:id/performance', authenticateToken, async (req, res) => {
       group: ['status'],
     });
 
-    // Use grandTotal or totalAmount field for Invoices
+    
     const invoiceStatusSummary = await Invoice.findAll({
       attributes: [
         'status',
@@ -169,7 +169,7 @@ router.get('/for-selection', authenticateToken, async (req, res) => {
                 isBlocked: false, 
                 isDeleted: false,
             },
-            attributes: ['id', 'name', 'isBlocked'], // Send only necessary data
+            attributes: ['id', 'name', 'isBlocked',], 
             order: [['name', 'ASC']],
         });
         res.json({ success: true, users });
@@ -189,7 +189,7 @@ router.get('/users', authenticateToken, async (req, res) => {
             });
             return res.json({ success: true, users });
     } else {
-    whereClause.id = req.subjectId; // Non-admin can only see themselves
+    whereClause.id = req.subjectId; 
             const user = await Member.findOne({
                 where: whereClause,
                 attributes: ['id', 'name', 'email', 'designation', 'parentAdmin', 'isBlocked', 'createdAt'],
@@ -204,7 +204,7 @@ router.get('/users', authenticateToken, async (req, res) => {
 });
 
 
-// Get single user by ID
+
 router.get('/users/:id', authenticateToken, async (req, res) => {
   try {
     const user = await Member.findByPk(req.params.id, {
@@ -223,7 +223,7 @@ router.get('/users/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Update user by ID
+
 router.put(
   '/users/:id',
   authenticateToken,
@@ -286,7 +286,7 @@ router.put(
   }
 );
 
-// Delete user by ID - admin only
+
 router.delete('/users/:id', authenticateToken, async (req, res) => {
   try {
     if (!isAdmin(req)) return res.status(403).json({ success: false, message: 'Forbidden' });

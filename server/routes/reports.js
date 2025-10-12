@@ -49,9 +49,9 @@ router.post('/leads', authenticateToken, async (req, res) => {
             dateRange = getDateRange(dateFilter);
         }
 
-        // **FIX START: Robust Closing Date Filter**
+      
         if (dateRange) {
-            // Use a CASE statement to safely extract the last closing date, preventing errors on empty arrays.
+            
             const latestClosingDateExpression = `
                 CASE
                     WHEN \`Lead\`.\`closingDates\` IS NOT NULL AND JSON_LENGTH(\`Lead\`.\`closingDates\`) > 0 THEN
@@ -60,12 +60,12 @@ router.post('/leads', authenticateToken, async (req, res) => {
                         NULL
                 END
             `;
-            // Use a raw literal for the WHERE clause to avoid issues with Sequelize's query generation
+           
             where[Op.and].push(
                 literal(`(${latestClosingDateExpression}) BETWEEN '${dateRange.start.toISOString()}' AND '${dateRange.end.toISOString()}'`)
             );
         }
-        // **FIX END**
+     
         
         if (filters && Array.isArray(filters)) {
             filters.forEach(filter => {
@@ -77,7 +77,7 @@ router.post('/leads', authenticateToken, async (req, res) => {
                 } else if (field === 'salesmanName') {
                     where[Op.and].push({ '$salesman.name$': { [Op.in]: include } });
                 } 
-                // **FIX START: Robust GP% Filter**
+               
                 else if (field === 'gpPercentage') {
                     const gpSubquery = `(SELECT profitPercent FROM quotes WHERE quotes.leadId = Lead.id AND quotes.quoteNumber = Lead.quoteNumber LIMIT 1)`;
                     
@@ -91,11 +91,11 @@ router.post('/leads', authenticateToken, async (req, res) => {
                         where[Op.and].push({ [Op.or]: rangeOrConditions });
                     }
                 }
-                // **FIX END**
+                
             });
         }
         
-        // **FIX START: Robust Sorting Logic**
+       
         let order;
         if (sortBy) {
             const direction = sortOrder || 'ASC';
@@ -119,7 +119,7 @@ router.post('/leads', authenticateToken, async (req, res) => {
         } else {
             order = [['createdAt', 'DESC']];
         }
-        // **FIX END**
+    
         
         if (where[Op.and].length === 0) delete where[Op.and];
         

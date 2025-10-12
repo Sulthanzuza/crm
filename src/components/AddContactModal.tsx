@@ -1,4 +1,4 @@
-// src/components/AddContactModal.tsx
+
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import Button from './Button';
@@ -46,8 +46,7 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
   };
 
 
-  // Reset form every time modal opens, but not when returning from NewCustomerModal
-  useEffect(() => {
+   useEffect(() => {
     if (open && !isNewCustomerModalOpen) {
       setSelectedCustomerId('');
       setFormData({
@@ -65,7 +64,7 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
 
 
 
-  // Fetch customers when the modal is opened
+
   useEffect(() => {
     if (open && !isNewCustomerModalOpen) {
       fetchCustomers();
@@ -90,9 +89,9 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
 
 
   const handleCustomerCreated = async (newCustomerId: string) => {
-    setIsNewCustomerModalOpen(false); // Close the new customer modal
-    await fetchCustomers(); // Refresh the customer list
-    setSelectedCustomerId(newCustomerId); // Pre-select the newly created customer
+    setIsNewCustomerModalOpen(false); 
+    await fetchCustomers(); 
+    setSelectedCustomerId(newCustomerId); 
   };
 
   const handleCloseNewCustomerModal = () => {
@@ -107,13 +106,13 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
       return;
     }
 
-    // 2. Check for a contact name
+
     if (!formData.name.trim()) {
       toast.error('Contact name is required.');
       return;
     }
 
-    // 3. Check for EITHER mobile or email
+  
     if (!formData.mobile.trim() && !formData.email.trim()) {
       toast.error('Either a mobile number or an email is required.');
       return;
@@ -122,7 +121,7 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
       toast.error('Please enter a valid phone number (only digits and an optional +).');
       return;
     }
-    // 4. (Optional but recommended) Validate email format if it exists
+    
     if (formData.email.trim() && !/^\S+@\S+\.\S+$/.test(formData.email)) {
       toast.error('Please provide a valid email address.');
       return;
@@ -133,9 +132,9 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
     try {
 
       await customerService.addContact(selectedCustomerId, formData, token);
-      onSuccess(); // reload data in parent
+      onSuccess(); 
       toast.success(`Contact added succesfully`)
-      onClose();   // close modal
+      onClose();  
     } catch (err: any) {
       toast.error(err?.data?.message || 'Failed to add contact.');
     } finally {
@@ -151,12 +150,12 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
 
   return (
     <>
-      {/* Main Modal - hidden when NewCustomerModal is open */}
+      
       <div className={`fixed inset-0 z-[99] flex items-center justify-center bg-black/10 backdrop-blur-sm p-6 ${isNewCustomerModalOpen ? 'hidden' : ''}`}>
         <div className="bg-white/50 dark:bg-midnight-900/40 backdrop-blur-xl border border-white/20 dark:border-midnight-700/30
                         w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
-          {/* Header */}
+        
           <div className="px-6 py-4 border-b border-white/20 dark:border-midnight-700/30 flex items-center justify-between">
             <h2 className="text-lg font-bold text-midnight-800 dark:text-ivory-100">Add New Contact</h2>
             <button
@@ -168,30 +167,18 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
             </button>
           </div>
 
-          {/* Wrap content in a form */}
+          
           <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
-            {/* Body */}
+            
             <div className="px-6 py-6 space-y-4 overflow-auto flex-1">
 
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
 
-                {/* Customer */}
+                
                 <div>
                   <label className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2">Customer</label>
                   <div className="flex items-center gap-2">
-                    {/* <select
-                      value={selectedCustomerId}
-                      onChange={handleCustomerChange}
-                     
-                      className="w-full h-10 px-3 rounded-xl border border-white/30 dark:border-midnight-700/30
-                                 bg-white/40 dark:bg-midnight-800/50 text-midnight-800 dark:text-ivory-100
-                                 shadow-sm focus:border-sky-400 focus:ring focus:ring-sky-300/50 text-sm transition"
-                    >
-                      <option value="" disabled>-- Select a Customer --</option>
-                      {customers.map(c => (
-                        <option key={c.id} value={c.id}>{c.companyName}</option>
-                      ))}
-                    </select> */}
+                   
                     <div className='w-full'>
                     <CustomSelect
                       value={selectedCustomerId}
@@ -314,7 +301,7 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
               </div>
             </div>
 
-            {/* Footer */}
+           
             <div className="px-6 py-4 border-t border-white/20 dark:border-midnight-700/30 flex justify-end gap-4">
               <Button
                 variant="secondary"
@@ -339,7 +326,7 @@ const AddContactModal: React.FC<Props> = ({ open, onClose, onSuccess }) => {
         </div>
       </div>
 
-      {/* New Customer Modal - rendered on top when open */}
+      
       {isNewCustomerModalOpen && (
         <NewCustomerModal
           open={isNewCustomerModalOpen}

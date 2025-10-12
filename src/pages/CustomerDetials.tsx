@@ -6,7 +6,7 @@ import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
 import DataTable from '../components/DataTable';
 import { Paperclip } from 'lucide-react';
-// Helper to render a detail item, avoids showing empty values
+
 const DetailItem: React.FC<{ label: string; value: string | undefined | null }> = ({ label, value }) => {
   if (!value) return null;
   return (
@@ -34,7 +34,7 @@ const CustomerDetail: React.FC = () => {
       setErr(null);
       try {
         const res = await customerService.getOne(id, token);
-        console.log(res.customer)
+        
         setCustomer(res.customer);
       } catch (e: any) {
         setErr(e?.data?.message || 'Failed to load customer details.');
@@ -46,7 +46,7 @@ const CustomerDetail: React.FC = () => {
     loadCustomer();
   }, [id, token]);
 
-  // Define columns for the contacts DataTable
+ 
   const contactColumns = [
     { 
       key: 'name', 
@@ -104,7 +104,7 @@ const CustomerDetail: React.FC = () => {
       <Sidebar />
       <main className="flex-1 overflow-y-auto h-screen">
         <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-          {/* Header */}
+        
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-midnight-900 dark:text-ivory-100 drop-shadow-lg">
@@ -174,7 +174,6 @@ const CustomerDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Contact Persons Table */}
           <div>
             <h2 className="text-xl font-semibold text-midnight-800 dark:text-ivory-200 mb-4">
               Contact Persons

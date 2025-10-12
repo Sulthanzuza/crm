@@ -16,13 +16,13 @@ ShareGp.init(
     },
     quoteId: {
       type: DataTypes.UUID,
-      allowNull: true, // A lead can be shared before a quote is created
+      allowNull: true, 
     },
-    memberId: { // The member who initiated the share (the creator)
+    memberId: { 
       type: DataTypes.UUID,
       allowNull: false,
     },
-    sharedMemberId: { // The member with whom the lead is shared
+    sharedMemberId: { 
       type: DataTypes.UUID,
       allowNull: false,
     },
@@ -38,11 +38,11 @@ ShareGp.init(
   {
     sequelize,
     tableName: 'share_gp',
-    timestamps: true, // Adds createdAt and updatedAt automatically
+    timestamps: true, 
     indexes: [
       {
         unique: true,
-        fields: ['leadId', 'sharedMemberId'], // Prevent sharing the same lead with the same member multiple times
+        fields: ['leadId', 'sharedMemberId'], 
       },
     ],
   }

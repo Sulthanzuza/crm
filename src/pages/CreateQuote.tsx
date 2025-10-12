@@ -11,15 +11,15 @@ import { customerService } from '../services/customerService';
 import PreviewModal from '../components/PreviewModal';
 import { toast } from 'react-hot-toast';
 import { X, Eye, Download } from 'lucide-react';
+import CustomSelect from '../components/CustomSelect';
 
-// --- Type Definitions ---
 type ItemState = {
   slNo: number;
   product: string;
   description: string;
   quantity: number;
-  unitCost: number;      // Wholesale purchase price
-  marginPercent: number;  // Margin to add on top
+  unitCost: number;     
+  marginPercent: number; 
   vatPercent: number;
 };
 
@@ -32,9 +32,9 @@ type QuoteItem = {
   unitCost: number;
   marginPercent: number;
   vatPercent: number;
-  unitPrice: number;      // Calculated: cost plus margin
-  totalCost: number;      // Cost * quantity
-  totalPrice: number;     // Unit price * quantity
+  unitPrice: number;     
+  totalCost: number;    
+  totalPrice: number;    
 };
 
 
@@ -45,7 +45,7 @@ type SavedQuote = {
 };
 
 
-// CSS to hide number input spinners
+
 const noSpinnersCSS = `
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -60,7 +60,7 @@ const CreateQuote: React.FC = () => {
   const isAdmin = user?.type === 'ADMIN';
 
 
-  // --- All State Declarations ---
+
   const [items, setItems] = useState<ItemState[]>([
     { slNo: 1, product: '', description: '', quantity: 1, unitCost: 0, marginPercent: 0, vatPercent: 5 },
   ]);
@@ -98,7 +98,7 @@ const CreateQuote: React.FC = () => {
   const today = new Date().toISOString().split('T')[0];
 
 
-  // --- Live Calculation Logic ---
+ 
   const totals = useMemo(() => {
     let subtotal = 0;
     let businessTotalCost = 0;
@@ -135,7 +135,7 @@ const CreateQuote: React.FC = () => {
   }, [items, discountMode, discountValue, sharePercent, leadIsShared]);
 
 
-  // --- Core Functions ---
+
   const addRow = () => setItems(prev => [...prev, { slNo: prev.length + 1, product: '', description: '', quantity: 1, unitCost: 0, marginPercent: 0, vatPercent: 5 }]);
   const removeRow = (idx: number) => setItems(prev => prev.filter((_, i) => i !== idx).map((it, idx2) => ({ ...it, slNo: idx2 + 1 })));
   const handleItemChange = (idx: number, patch: Partial<ItemState>) => setItems(prev => prev.map((item, i) => (i === idx ? { ...item, ...patch } : item)));
@@ -308,7 +308,7 @@ const CreateQuote: React.FC = () => {
   }, [token, user, isAdmin]);
 
 
-  // --- FINAL CORRECTED useEffect ---
+  
   useEffect(() => {
     if (!token || !selectedLeadId) {
       resetAllFields();
@@ -374,10 +374,10 @@ const CreateQuote: React.FC = () => {
         resetAllFields();
       }
     })();
-  }, [token, selectedLeadId, isAdmin, user]); // user is added to dependency array
+  }, [token, selectedLeadId, isAdmin, user]); 
 
 
-  // --- FINAL CORRECTED useMemo ---
+
   const canViewSharePercent = useMemo(() => {
     if (!lead || !leadIsShared || !Array.isArray(lead.sharedWith)) {
       return false;
@@ -387,7 +387,7 @@ const CreateQuote: React.FC = () => {
       return true;
     }
   
-    // Check if the current user is either the original owner (memberId) or the person it's shared with (sharedMemberId)
+   
     return lead.sharedWith.some(share => 
       String(share.ShareGp?.memberId) === String(user?.id) ||
       String(share.ShareGp?.sharedMemberId) === String(user?.id)
@@ -402,7 +402,7 @@ const CreateQuote: React.FC = () => {
         <Sidebar />
         <div className="flex-1 overflow-y-auto h-screen">
           <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            {/* Header */}
+         
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
               <div>
                 <h1 className="text-2xl font-extrabold text-midnight-900 dark:text-ivory-200">Create Quote</h1>
@@ -411,7 +411,7 @@ const CreateQuote: React.FC = () => {
             </div>
 
             <form onSubmit={save} className="space-y-6 bg-cloud-50/40 dark:bg-midnight-900/40 backdrop-blur-xl border border-cloud-300/40 dark:border-midnight-700/40 rounded-2xl p-8 shadow-xl">
-              {/* Top Row: Lead, Dates, Salesman */}
+            
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Lead Number</label>
@@ -426,34 +426,53 @@ const CreateQuote: React.FC = () => {
                   <input type="date" value={validityUntil} min={today} onChange={(e) => setValidityUntil(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-cloud-300/50 dark:border-midnight-600/50 bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100 shadow-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Salesman</label>
+                 <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Salesman</label>
                   {isAdmin ? (
-                    <select value={salesmanId} className="w-full h-11 px-4 rounded-xl border ..." onChange={(e) => setSalesmanId(e.target.value)} required>
-                      <option value="" disabled>Select salesman</option>
-                      {salesmen.map((s) => (<option key={s.id} value={s.id} disabled={s.isBlocked}>{s.name}{s.isBlocked ? ' (Blocked)' : ''}</option>))}
-                    </select>
+                   <CustomSelect
+  
+  value={salesmanId}
+  onChange={setSalesmanId}
+  options={[
+    { value: "", label: "Select salesman", isDisabled: true },
+    ...salesmen.map(s => ({
+      value: s.id,
+      label: s.name + (s.isBlocked ? " (Blocked)" : ""),
+      isDisabled: s.isBlocked
+    }))
+  ]}
+  placeholder="Select salesman"
+/>
+
                   ) : (
+                     
                     <input value={user?.name || ''} disabled className="w-full h-11 px-4 rounded-xl border bg-cloud-100/60 dark:bg-midnight-800/60" />
                   )}
                 </div>
 
 
-                {/* Currency Dropdown */}
+               
                 <div >
-                  <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Currency</label>
-                  <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-cloud-300/50 dark:border-midnight-600/50 bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100 shadow-sm" required>
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="INR">INR - Indian Rupee</option>
-                    <option value="SAR">SAR - Saudi Riyal</option>
-                    <option value="AED">AED - UAE Dirham</option>
-                    <option value="QAR">QAR - Qatari Riyal</option>
-                    <option value="KWD">KWD - Kuwaiti Dinar</option>
-                    <option value="BHD">BHD - Bahraini Dinar</option>
-                    <option value="OMR">OMR - Omani Rial</option>
-                  </select>
+                 <CustomSelect
+  label="Currency"
+  value={currency}
+  onChange={setCurrency}
+  options={[
+    { value: "USD", label: "USD - US Dollar" },
+    { value: "INR", label: "INR - Indian Rupee" },
+    { value: "SAR", label: "SAR - Saudi Riyal" },
+    { value: "AED", label: "AED - UAE Dirham" },
+    { value: "QAR", label: "QAR - Qatari Riyal" },
+    { value: "KWD", label: "KWD - Kuwaiti Dinar" },
+    { value: "BHD", label: "BHD - Bahraini Dinar" },
+    { value: "OMR", label: "OMR - Omani Rial" }
+  ]}
+  placeholder="Select currency"
+  required
+/>
+
                 </div>
 
-                {/* Share Percentage Input (Conditional) */}
+           
                 {canViewSharePercent && (
                   <div>
                     <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Share Percentage (%)</label>
@@ -470,7 +489,7 @@ const CreateQuote: React.FC = () => {
 
               </div>
 
-              {/* Customer and Contact Details */}
+             
               <div className="border-t border-cloud-300/40 dark:border-midnight-700/40 pt-6">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
@@ -479,16 +498,23 @@ const CreateQuote: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Contact Person</label>
-                    <select className="w-full h-11 px-4 rounded-xl border ..." value={contactId ?? ""}
-                      onChange={(e) => {
-                        const selectedContact = contacts.find(c => c.id === e.target.value);
-                        if (selectedContact) autofillContactFields(selectedContact);
-                      }}>
-                      <option value="" disabled>Select Contact</option>
-                      {contacts.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                   <CustomSelect
+ 
+  value={contactId ?? ""}
+  onChange={val => {
+    const selectedContact = contacts.find(c => c.id === val);
+    if (selectedContact) autofillContactFields(selectedContact);
+  }}
+  options={[
+    { value: "", label: "Select Contact", isDisabled: true },
+    ...contacts.map((c) => ({
+      value: c.id,
+      label: c.name
+    }))
+  ]}
+  placeholder="Select Contact"
+/>
+
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Phone</label>
@@ -512,19 +538,11 @@ const CreateQuote: React.FC = () => {
               </div>
 
 
-  {/* Description Textarea */}
+
                   <div >
                     <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Description</label>
                     <textarea rows={3} className="w-full px-4 py-3 rounded-xl border ..." value={description} onChange={(e) => setDescription(e.target.value)} />
                   </div>
-
-
-
-
-
-
-
-              {/* Items Table */}
 
               <div className="overflow-x-auto border border-cloud-400/30 rounded-xl shadow-sm">
                 <table className="min-w-full border-collapse rounded-xl overflow-hidden shadow-sm text-sm">
@@ -669,27 +687,23 @@ const CreateQuote: React.FC = () => {
                   </Button>
                 </div>
                 <div className="space-y-2 w-[30%]">
-                  {/* Label */}
+                
                   <label className="block text-sm font-semibold text-midnight-800/90">
                     Discount
                   </label>
 
-                  {/* Input group */}
+              
                   <div className="flex items-center gap-3  rounded-xl ">
-                    <select
-                      className="w-1/2 h-10 rounded-lg px-2 
-                            bg-white/70 border border-cloud-400/50 
-                            text-sm text-midnight-700 
-                            focus:ring-2 focus:ring-sky-300/40 focus:border-sky-400
-                            outline-none transition-all"
-                      value={discountMode}
-                      onChange={(e) =>
-                        setDiscountMode(e.target.value as "PERCENT" | "AMOUNT")
-                      }
-                    >
-                      <option value="PERCENT">Percent (%)</option>
-                      <option value="AMOUNT">Amount</option>
-                    </select>
+                   <CustomSelect
+  value={discountMode}
+  onChange={val => setDiscountMode(val as "PERCENT" | "AMOUNT")}
+  options={[
+    { value: "PERCENT", label: "Percent" },
+    { value: "AMOUNT", label: "Amount" }
+  ]}
+  placeholder="Select Discount Mode"
+/>
+
 
                     <input
                       type="number"
@@ -704,7 +718,7 @@ const CreateQuote: React.FC = () => {
                     />
                   </div>
 
-                  {/* Helper text */}
+                 
                   {discountMode === "AMOUNT" && totals.subtotal > 0 && (
                     <p className="text-xs text-gray-500/80 italic">
                       Approximate: {((discountValue / totals.subtotal) * 100).toFixed(2)}%
@@ -731,7 +745,7 @@ const CreateQuote: React.FC = () => {
                     </div>
 
 
-                    {/* Terms and Conditions */}
+                   
                     <div>
                       <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Terms and Conditions</label>
                       <textarea rows={5} value={termsAndConditions} onChange={(e) => setTermsAndConditions(e.target.value)} className="w-full rounded-xl border border-cloud-300/40 dark:border-midnight-700/40 bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100 shadow-sm p-3 resize-none" placeholder="Enter terms and conditions..." />
@@ -740,7 +754,7 @@ const CreateQuote: React.FC = () => {
                   </div>
 
 
-                  {/* Totals Summary */}
+                  
                   {totals && (
                     <div className="mt-5 p-6 rounded-2xl bg-cloud-100/50 dark:bg-midnight-800/50 
                 backdrop-blur-md border border-cloud-300/40 dark:border-midnight-600/40 
@@ -762,7 +776,7 @@ const CreateQuote: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+          
               <div className="flex justify-end gap-3 mt-6 border-t ... pt-4">
                 <Button type="submit" disabled={saving || !!lastSavedQuote}>{saving ? "Saving..." : "Save Quote"}</Button>
                 {lastSavedQuote && (
@@ -774,7 +788,7 @@ const CreateQuote: React.FC = () => {
                 <Button type="button" variant="secondary" onClick={() => navigate(selectedLeadId ? `/leads/${selectedLeadId}` : "/leads")} disabled={saving}>Cancel</Button>
               </div>
 
-              {/* Last Saved Quote Info */}
+            
               {lastSavedQuote && (<div className="mt-4 p-4 ... text-center">
                 Quote #{lastSavedQuote.number} saved successfully.
                 {lastSavedQuote.isApproved === false && " It is now pending admin approval."}

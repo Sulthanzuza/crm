@@ -1,30 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// Defines a generic filter object that can be used across different pages
+
 export interface Filter {
-  type: string; // The key for the filter, e.g., 'Industry'
-  label: string; // The display name for the filter pill, e.g., 'Industry'
-  values: string[]; // The selected values for the filter
+  type: string; 
+  label: string; 
+  values: string[]; 
 }
 
 interface FilterDropdownProps {
-  // A map of filter types (keys) to their available string options (values)
+ 
   options: Record<string, string[]>;
-  // The array of currently applied filters
+ 
   appliedFilters: Filter[];
-  // Callback function to update the filters in the parent component
+ 
   onApplyFilters: (filters: Filter[]) => void;
 }
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({ options, appliedFilters, onApplyFilters }) => {
   const [isOpen, setIsOpen] = useState(false);
-  // The currently active tab in the dropdown (e.g., 'Industry', 'Category')
+  
   const [currentTab, setCurrentTab] = useState<string>(Object.keys(options)[0]);
-  // The values selected in the current tab's checkbox list
+  
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Effect to close the dropdown when clicking outside of it
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -35,29 +35,29 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ options, appliedFilters
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // When a tab is clicked, update the current view and load existing selections
+ 
   const openTab = (tab: string) => {
     setCurrentTab(tab);
     const existingFilter = appliedFilters.find(f => f.type === tab);
     setSelectedValues(existingFilter?.values || []);
   };
 
-  // Toggles a checkbox option on or off
+  
   const toggleOption = (option: string) => {
     setSelectedValues(prev =>
       prev.includes(option) ? prev.filter(item => item !== option) : [...prev, option]
     );
   };
 
-  // Applies the filters for the current tab and closes the dropdown
+  
   const handleApply = () => {
-    // Remove the old filter for the current tab to avoid duplicates
+   
     let newFilters = appliedFilters.filter(f => f.type !== currentTab);
-    // Add the new selection back if any values are selected
+    
     if (selectedValues.length > 0) {
       newFilters.push({
         type: currentTab,
-        label: currentTab, // Use the tab name as the label
+        label: currentTab, 
         values: selectedValues
       });
     }
@@ -65,7 +65,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ options, appliedFilters
     setIsOpen(false);
   };
 
-  // Removes an entire filter pill when the 'x' is clicked
+
   const handleRemoveFilter = (type: string) => {
     onApplyFilters(appliedFilters.filter(f => f.type !== type));
   };
@@ -73,12 +73,12 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ options, appliedFilters
   return (
     <div className="w-full">
       <div className="relative inline-block text-left" ref={ref}>
-        {/* The main "Filter" button that toggles the dropdown */}
+       
         <button
           onClick={() => {
             setIsOpen(!isOpen);
             if (!isOpen) {
-              // Default to the first tab when opening
+            
               openTab(Object.keys(options)[0]);
             }
           }}
@@ -87,7 +87,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ options, appliedFilters
           Filter
         </button>
 
-        {/* The dropdown menu */}
+       
         {isOpen && (
           <div className="origin-top-left absolute left-0 mt-2 w-80  rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
             <div className="flex border-b">
@@ -120,7 +120,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ options, appliedFilters
         )}
       </div>
 
-      {/* Display applied filters as pills below the button */}
+     
       <div className="flex flex-wrap gap-2 mt-4">
         {appliedFilters.map(filter => (
           <div key={filter.type} className="flex items-center bg-sky-100 text-sky-600 rounded-full px-3 py-1 text-sm">

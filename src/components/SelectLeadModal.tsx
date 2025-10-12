@@ -4,8 +4,6 @@ import Button from './Button';
 import { useAuth } from '../contexts/AuthContext';
 import { leadsService } from '../services/leadsService';
 
-// Assuming DataTable is not used directly in this simplified list view.
-// import DataTable from '../components/DataTable';
 
 type LeadRow = {
   id: string;
@@ -24,7 +22,6 @@ type Props = {
   onSelect: (lead: LeadRow) => void;
 };
 
-// A custom hook to debounce user input
 const useDebounced = (value: string, delay = 350) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
   useEffect(() => {
@@ -47,10 +44,10 @@ const SelectLeadModal: React.FC<Props> = ({ open, onClose, onSelect }) => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Set a constant page size since the dropdown is removed
+  
   const pageSize = 20;
 
-  // Reset state when the modal is opened
+
   useEffect(() => {
     if (open) {
       setQuery('');
@@ -60,7 +57,7 @@ const SelectLeadModal: React.FC<Props> = ({ open, onClose, onSelect }) => {
     }
   }, [open]);
 
-  // Effect to fetch data when dependencies (like page or query) change
+ 
   useEffect(() => {
     if (!open || !token) return;
     
@@ -69,7 +66,7 @@ const SelectLeadModal: React.FC<Props> = ({ open, onClose, onSelect }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Pass the query and pagination parameters to the service
+      
         const res = await leadsService.myLeads(token);
 
         if (!isCancelled) {
@@ -106,7 +103,7 @@ const SelectLeadModal: React.FC<Props> = ({ open, onClose, onSelect }) => {
   return (
     <Modal open={open} onClose={onClose} title="Select Lead" size="lg">
       <div className="flex flex-col h-[70vh]">
-        {/* Search Input */}
+      
         <div className="flex items-center gap-2 mb-4">
           <input
             className="flex-1 h-10 rounded-lg form-input px-3"
@@ -114,13 +111,12 @@ const SelectLeadModal: React.FC<Props> = ({ open, onClose, onSelect }) => {
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setPage(1); // Reset to first page on new search
+              setPage(1); 
             }}
             aria-label="Search Leads"
           />
         </div>
 
-        {/* Leads List */}
         <div className="flex-1 border rounded-lg overflow-y-auto">
           <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-cloud-50 dark:bg-midnight-800 border-b 
                           text-xs font-semibold text-midnight-700 dark:text-ivory-300 sticky top-0 z-10 text-center">
@@ -173,7 +169,7 @@ const SelectLeadModal: React.FC<Props> = ({ open, onClose, onSelect }) => {
           )}
         </div>
 
-        {/* Pagination */}
+       
         <div className="flex justify-between items-center mt-4">
           
           <div className="flex items-center gap-2">

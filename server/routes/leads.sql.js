@@ -24,45 +24,27 @@ const { sequelize } = require('../config/database');
 const Counter = require('../models/Counter');
 const ShareGp= require('../models/ShareGp')
 function canViewLead(req, lead) {
-    
 
-    // Check 1: Is the user an admin?
     if (isAdmin(req)) {
         
         return true;
     }
-
     const currentUserId = String(req.subjectId);
-  
-
-    // Check 2: Is the user the creator?
 
     if (String(lead.creatorId) === currentUserId) {
 
         return true;
     }
-
-    // Check 3: Is the user the salesman?
-  
     if (String(lead.salesmanId) === currentUserId) {
      
         return true;
     }
-
-
-    
-    // Does the `lead.sharedWith` property exist and is it an array?
     if (Array.isArray(lead.sharedWith)) {
-      
-        
         const isShared = lead.sharedWith.some(member => String(member.id) === currentUserId);
-        
         if (isShared) {
-          
             return true;
         } 
       }
-      
     return false;
 }
 
@@ -75,27 +57,20 @@ function canManageLead(req, lead) {
 }
 
 async function canModifyLead(req, lead) {
-    // 1. Admins can always modify.
+  
     if (isAdmin(req)) {
         return true;
     }
-
     const currentUserId = String(req.subjectId);
-
-    // 2. The creator or assigned salesman can modify.
     if (String(lead.creatorId) === currentUserId || String(lead.salesmanId) === currentUserId) {
         return true;
     }
-
-    // 3. A shared member can modify (this requires a DB check).
     const share = await ShareGp.findOne({
         where: {
             leadId: lead.id,
             sharedMemberId: currentUserId,
         },
     });
-    
-    // If a 'share' record exists, the user has permission.
     return !!share;
 }
 
@@ -153,18 +128,16 @@ async function writeLeadLog(req, leadId, action, message) {
   return created;
 }
 
-// Compute nearest future follow-up (returns Date or null)
+
 function nearestFutureFollowup(rows) {
     const now = new Date();
-    // Ensure all items are plain objects
+    
     const flat = rows.map(r => (typeof r.get === 'function' ? r.get({ plain: true }) : r));
     
-    // Filter for dates in the future and sort them to find the soonest
+    
     const future = flat
       .filter(r => r.scheduledAt && new Date(r.scheduledAt) > now)
       .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
-  
-    // CORRECTED: Return the 'scheduledAt' property of the first item in the sorted array
     return future.length > 0 ? future[0].scheduledAt : null;
 }
 
@@ -176,7 +149,7 @@ router.delete('/:id/attachments', authenticateToken, async (req, res) => {
         const lead = await Lead.findByPk(req.params.id);
         if (!lead) return res.status(404).json({ success: false, message: 'Not found' });
 
-        // UPDATED: Use canViewLead for broader permissions
+        
         if (!(await canViewLead(req, lead))) {
             return res.status(403).json({ success: false, message: 'Forbidden' });
         }
@@ -213,7 +186,7 @@ const actorName = await resolveActorName(req);
     }
 });
 
-// Delete attachment (POST alias for frontend flexibility)
+
 router.post('/:id/attachments/delete', authenticateToken, async (req, res) => {
     try {
         const { filename, url } = req.body || {};
@@ -222,7 +195,7 @@ router.post('/:id/attachments/delete', authenticateToken, async (req, res) => {
         const lead = await Lead.findByPk(req.params.id);
         if (!lead) return res.status(404).json({ success: false, message: 'Not found' });
 
-        // UPDATED: Use canViewLead for broader permissions
+        
         if (!(await canViewLead(req, lead))) {
             return res.status(403).json({ success: false, message: 'Forbidden' });
         }
@@ -261,7 +234,7 @@ router.post('/:id/attachments', authenticateToken, upload.array('files', 10), as
         const lead = await Lead.findByPk(req.params.id);
         if (!lead) return res.status(404).json({ success: false, message: 'Not found' });
         
-        // UPDATED: Use canViewLead for broader permissions
+       
         if (!(await canViewLead(req, lead))) {
             return res.status(403).json({ success: false, message: 'Forbidden' });
         }
@@ -316,7 +289,7 @@ router.get('/', authenticateToken, async (req, res) => {
             [Op.and]: [],
         };
 
-        // 1. Permission-based filtering
+        
         if (!isAdmin(req)) {
             const sharedLeadsSubQuery = sequelize.literal(
                 `(SELECT "leadId" FROM "share_gp" WHERE "sharedMemberId" = '${req.subjectId}')`
@@ -330,7 +303,7 @@ router.get('/', authenticateToken, async (req, res) => {
             });
         }
 
-        // 2. Search term condition
+       
         if (search && String(search).trim()) {
             const searchTerm = `%${String(search).trim()}%`;
             where[Op.and].push({
@@ -345,7 +318,7 @@ router.get('/', authenticateToken, async (req, res) => {
             });
         }
         
-        // 3. Filters for 'stage' and 'forecastCategory'
+        
         if (stage) {
             where[Op.and].push({ stage: { [Op.in]: String(stage).split(',') } });
         }
@@ -353,7 +326,7 @@ router.get('/', authenticateToken, async (req, res) => {
             where[Op.and].push({ forecastCategory: { [Op.in]: String(forecastCategory).split(',') } });
         }
 
-        // 4. Complex filter logic for 'followup' status
+        
         if (followup) {
             const followupConditions = String(followup).split(',');
             const leadIdSubqueries = [];
@@ -377,7 +350,7 @@ router.get('/', authenticateToken, async (req, res) => {
             }
         }
         
-        // --- Fetch Leads with the corrected query ---
+      
         const leads = await Lead.findAll({
             where: where[Op.and].length > 0 ? where : {},
             include: [
@@ -397,7 +370,7 @@ router.get('/', authenticateToken, async (req, res) => {
             subQuery: false
         });
 
-        // --- Post-query processing for 'nextFollowupAt' ---
+       
         const leadIds = leads.map(l => l.id);
         const nextByLead = new Map();
         if (leadIds.length > 0) {
@@ -418,8 +391,6 @@ router.get('/', authenticateToken, async (req, res) => {
                 if (nearest) nextByLead.set(leadId, nearest.scheduledAt);
             }
         }
-
-        // --- Map the final response ---
         res.json({
             success: true,
             leads: leads.map(l => ({

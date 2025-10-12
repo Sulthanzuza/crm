@@ -9,7 +9,7 @@ Vendor.init({
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4
   },
-  // Basic Info
+
   vendorName: { type: DataTypes.STRING(200), allowNull: false },
   contactPerson: { type: DataTypes.STRING(160), allowNull: true },
   email: { type: DataTypes.STRING(180), allowNull: true, validate: { isEmail: true } },
@@ -20,7 +20,7 @@ Vendor.init({
   state: { type: DataTypes.STRING(120), allowNull: true },
   country: { type: DataTypes.STRING(120), allowNull: true },
   zipCode: { type: DataTypes.STRING(20), allowNull: true },
-  // Business Info
+ 
   industry: { type: DataTypes.STRING(120), allowNull: true },
   category: {
     type: DataTypes.ENUM('Manufacturer','Distributor','Service Provider','Other'),
@@ -31,7 +31,7 @@ Vendor.init({
   vatNo: { type: DataTypes.STRING(80), allowNull: true },
   panNo: { type: DataTypes.STRING(80), allowNull: true },
   registrationNo: { type: DataTypes.STRING(100), allowNull: true },
-  // Financial
+ 
   paymentTerms: {
     type: DataTypes.ENUM('Advance','Net15','Net30','Net60'),
     allowNull: true
@@ -45,7 +45,7 @@ Vendor.init({
   bankName: { type: DataTypes.STRING(120), allowNull: true },
   bankAccountNo: { type: DataTypes.STRING(50), allowNull: true },
   ifscSwiftCode: { type: DataTypes.STRING(50), allowNull: true },
-  // Relationship
+
   status: {
     type: DataTypes.ENUM('Active','Inactive','OnHold','Blacklisted'),
     defaultValue: 'Active'
@@ -54,12 +54,12 @@ Vendor.init({
   lastOrderDate: { type: DataTypes.DATE, allowNull: true },
   totalOrders: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 0 },
   remarks: { type: DataTypes.TEXT, allowNull: true },
-  // Foreign Key for Member association
+ 
   assignedTo: {
     type: DataTypes.UUID,
     allowNull: true,
     references: {
-      model: 'members', // table name
+      model: 'members',
       key: 'id'
     }
   },

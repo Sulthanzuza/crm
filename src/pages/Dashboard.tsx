@@ -14,12 +14,12 @@ import { useRef } from 'react';
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 
-// --- Helper Components ---
+
 const Loader = () => <div className="flex h-screen w-full items-center justify-center"><div className="animate-spin rounded-full h-24 w-24 border-t-4 border-b-4 border-indigo-600"></div></div>;
 const ErrorMessage = ({ message }) => (<div className="col-span-full flex flex-col items-center justify-center text-center p-10 bg-red-50 border-2 border-dashed border-red-200 rounded-2xl"><AlertTriangle className="w-16 h-16 text-red-400 mb-4" /><h3 className="text-xl font-bold text-red-800">Oops!</h3><p className="text-red-600 mt-2">{message}</p></div>);
 
 
-// This component is now interactive
+
 const PieChartCard = ({ title, chartData, centerTextLabel, centerTextValue, onSliceClick }) => {
     const chartRef = useRef();
 

@@ -11,7 +11,7 @@ export default {
           200: "#cfd3d7",
           300: "#b4bbc0",
           400: "#99a3aa",
-          500: "#7f8a91", // base soft cloudy gray-blue
+          500: "#7f8a91",
           600: "#667078",
           700: "#4d565d",
           800: "#343c42",
@@ -23,7 +23,7 @@ export default {
           200: "#d2c8c2",
           300: "#bbaa9f",
           400: "#a48e81",
-          500: "#8c7468", // base warm brown/stone
+          500: "#8c7468", 
           600: "#705b52",
           700: "#55443e",
           800: "#3a2e2a",
@@ -35,7 +35,7 @@ export default {
           200: "#bfd6e3",
           300: "#9bbfd3",
           400: "#77a9c4",
-          500: "#5d8fab", // base muted blue
+          500: "#5d8fab", 
           600: "#4b7389",
           700: "#395866",
           800: "#273d44",
@@ -47,7 +47,7 @@ export default {
           200: "#ece9e4",
           300: "#e1ded6",
           400: "#d6d2c8",
-          500: "#cfc8bd", // base soft ivory white
+          500: "#cfc8bd", 
           600: "#b3aca3",
           700: "#979088",
           800: "#7b746d",
@@ -59,7 +59,7 @@ export default {
           200: "#b9c2c7",
           300: "#92a0a7",
           400: "#6c7e87",
-          500: "#4b5c65", // base deep charcoal
+          500: "#4b5c65", 
           600: "#3c4a52",
           700: "#2d383e",
           800: "#1e262a",

@@ -48,21 +48,18 @@ const Sidebar: React.FC = () => {
                  flex flex-col shadow-2xl 
                  transition-all duration-300 overflow-hidden"
     >
-      {/* Brand */}
+    
     <div className="h-16 bg-white px-2 border-b border-midnight-700/40 flex items-center transition-all duration-300">
     <div className="flex items-center space-x-1 ">
         
-        {/* Emblem - Always Visible */}
-        {/* The size h-12 w-12 was working well, so we keep it. */}
+        
         <img 
             src={Emblem} 
             className="h-20 w-12 flex-shrink-0 " 
             alt="Artiflex Emblem" 
         />
         
-        {/* Logo - Visible on Hover */}
-        {/* We set a fixed height and let the width adjust automatically, with a max-width to prevent it from getting too large. */}
-        <img 
+         <img 
             src={Logo} 
             className="h-17 w-auto max-w-[130px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
             alt="Artiflex Logo" 

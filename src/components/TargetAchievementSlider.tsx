@@ -57,7 +57,7 @@ const TargetAchievementSlider: React.FC<TargetAchievementSliderProps> = ({ data,
     );
   }
 
-  // Calculate visible items for current "slide"
+
   const visibleData = useMemo(() => {
     if (!isSliderActive) return data;
     const subset: MemberTargetAchievementWithId[] = [];
@@ -68,7 +68,7 @@ const TargetAchievementSlider: React.FC<TargetAchievementSliderProps> = ({ data,
     return subset;
   }, [currentIndex, data, isSliderActive, itemsInRow]);
 
-  // If no slider needed, show all data in a row flex
+  
   if (!isSliderActive) {
     return (
       <div className="bg-gray-100/30 backdrop-blur-md border border-gray-300/70 py-10 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 min-h-[400px]">
@@ -86,7 +86,7 @@ const TargetAchievementSlider: React.FC<TargetAchievementSliderProps> = ({ data,
     );
   }
 
-  // Slider active, show carousel style
+
   return (
     <div className="bg-gray-100/30 backdrop-blur-md border border-gray-300/70 py-10 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 min-h-[400px] relative">
       <h3 className="text-3xl font-bold text-center text-gray-800 tracking-tight mb-6">

@@ -73,10 +73,10 @@ const SetTargetModal: React.FC<SetTargetModalProps> = ({ isOpen, onClose, token,
             let res;
 
             if (memberIds.length === members.length) {
-                // Bulk update all active members
+             
                 res = await api.post('/targets/bulk', payload, token);
             } else {
-                // Individual update for selected members
+                
                 const promises = memberIds.map(id =>
                     api.post('/targets', { ...payload, memberId: id }, token)
                 );

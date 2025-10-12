@@ -53,7 +53,7 @@ const Users: React.FC = () => {
 
 
   useEffect(() => {
-    load();
+    load(token);
    
   }, [token]);
 
@@ -84,7 +84,7 @@ const Users: React.FC = () => {
     }
   };
 
-  // derived rows: filter -> search -> sort -> paginate
+
   const filtered = useMemo(() => {
     let rows = [...items];
 

@@ -1,4 +1,3 @@
-// src/components/ShareLeadModal.tsx
 
 import React,{  useState ,useEffect} from 'react';
 import toast from 'react-hot-toast';
@@ -26,7 +25,7 @@ const ShareLeadModal: React.FC<ShareLeadModalProps> = ({ open, onClose, leadId, 
     if (open && token) {
       teamService.list(token)
         .then(res => {
-          // Filter out the current user/creator from the list of members to share with
+         
           const filteredUsers = res.users.filter(u => u.id !== creatorId && u.id !== user?.id);
           setMembers(filteredUsers);
         })
@@ -52,7 +51,7 @@ const ShareLeadModal: React.FC<ShareLeadModalProps> = ({ open, onClose, leadId, 
       await leadsService.shareLead(leadId, payload, token);
       toast.success('Lead shared successfully!');
       onClose();
-      // Reset form
+    
       setSelectedMember('');
       setProfitPercentage('');
       setProfitAmount('');

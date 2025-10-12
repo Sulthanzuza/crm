@@ -10,7 +10,7 @@ const Invoice = require('../models/Invoices');
 
 const router = express.Router();
 
-// GET /api/deals - Fetches a list of all closed deals for the table view
+
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const whereClause = { stage: 'Deal Closed' };
@@ -58,7 +58,7 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// GET /api/deals/:id - Fetches all details for a single deal
+
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const whereClause = { id: req.params.id, stage: 'Deal Closed' };

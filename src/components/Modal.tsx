@@ -1,4 +1,4 @@
-// components/Modal.tsx
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,14 +27,14 @@ const sizeClass = (s?: string) =>
     : 'max-w-xl';
 
 const Modal: React.FC<Props> = ({ open, title, onClose, children, footer, size }) => {
-  // Helper to determine if the footer is the structured object or custom JSX
+
   const isStructuredFooter = footer && typeof footer === 'object' && !React.isValidElement(footer);
 
   return (
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[99] flex items-center bg-black/10 backdrop-blur-sm  justify-center p-4">
-          {/* Overlay */}
+         
           <motion.div
             className="absolute inset-0 bg-white/40 backdrop-blur-xl text-midnight-200"
             onClick={onClose}
@@ -43,7 +43,7 @@ const Modal: React.FC<Props> = ({ open, title, onClose, children, footer, size }
             exit={{ opacity: 0 }}
           />
 
-          {/* Modal Card */}
+        
           <motion.div
             className={`relative w-full ${sizeClass(size)} mx-auto rounded-2xl
                          backdrop-blur-xl
@@ -54,7 +54,7 @@ const Modal: React.FC<Props> = ({ open, title, onClose, children, footer, size }
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Header */}
+          
             <div className="px-6 py-4 border-b border-cloud-200/30 dark:border-midnight-700/50 flex justify-between items-center">
               <h3 className="text-lg font-bold text-midnight-800 dark:text-ivory-100">{title}</h3>
               <button
@@ -65,12 +65,12 @@ const Modal: React.FC<Props> = ({ open, title, onClose, children, footer, size }
               </button>
             </div>
 
-            {/* Content */}
+        
             <div className="p-6 text-midnight-700 dark:text-ivory-100">
               {children}
             </div>
 
-            {/* Footer */}
+          
             {footer && (
               <div className="px-6 py-4 border-t border-gray-200/50 dark:border-midnight-700/50 flex justify-end gap-3">
                 {isStructuredFooter ? (

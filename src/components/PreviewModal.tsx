@@ -14,26 +14,26 @@ type Props = {
 const PreviewModal: React.FC<Props> = ({ open, onClose, html, onDownload, downloading, title }) => {
   if (!open) return null;
 
-  // A4 at ~96dpi
+  
   const A4_WIDTH = 794;
   const A4_HEIGHT = 1123;
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-      {/* Overlay */}
+      
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
+   
       <div className="relative z-10 bg-white/80 dark:bg-midnight-900/80 
                       backdrop-blur-xl border border-cloud-200/40 
                       dark:border-midnight-700/40 
                       rounded-2xl shadow-2xl w-[95vw] max-w-[1100px] 
                       max-h-[90vh] flex flex-col overflow-hidden">
         
-        {/* Header */}
+       
         <div className="px-5 py-3 border-b border-cloud-200/40 dark:border-midnight-700/40 flex items-center justify-between">
           <h2 className="text-lg font-bold text-midnight-800 dark:text-ivory-100">
             {title || 'Quote Preview'}
@@ -58,7 +58,7 @@ const PreviewModal: React.FC<Props> = ({ open, onClose, html, onDownload, downlo
           </div>
         </div>
 
-        {/* Content */}
+        
         <div className="flex-1 overflow-auto p-4 bg-cloud-50/30 dark:bg-midnight-950/20">
           <div
             className="w-full h-full flex items-center justify-center"
@@ -88,7 +88,7 @@ const PreviewModal: React.FC<Props> = ({ open, onClose, html, onDownload, downlo
           </div>
         </div>
 
-        {/* Footer */}
+      
         <div className="px-5 py-3 border-t border-cloud-200/40 dark:border-midnight-700/40 flex justify-end">
           <Button variant="secondary" onClick={onClose}>Close</Button>
         </div>

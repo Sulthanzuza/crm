@@ -1,4 +1,4 @@
-// routes/notifications.sql.js
+
 const express = require('express');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
 const Notification = require('../models/Notification');
@@ -40,7 +40,7 @@ router.patch('/:id/read', authenticateToken, async (req, res) => {
 
 router.post('/mark-all-read', authenticateToken, async (req, res) => {
   try {
-    // This action is only available for non-admin members for their own notifications.
+    
     if (isAdmin(req)) {
       return res.status(403).json({ success: false, message: 'Admins cannot use this feature directly.' });
     }
@@ -48,7 +48,7 @@ router.post('/mark-all-read', authenticateToken, async (req, res) => {
     const whereClause = {
       toType: 'MEMBER',
       toId: String(req.subjectId),
-      read: false // Only update unread notifications
+      read: false 
     };
 
     await Notification.update({ read: true }, { where: whereClause });

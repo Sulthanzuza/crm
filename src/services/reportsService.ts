@@ -20,6 +20,7 @@ export interface ReportParams {
   customEndDate?: string;
   filters?: Filter[];
   sortBy?: string;
+  searchQuery?:string;
   sortOrder?: 'ASC' | 'DESC';
   groupBy?: string;
 }

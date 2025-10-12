@@ -5,10 +5,11 @@ import { customerService } from '../services/customerService';
 import { useAuth } from '../contexts/AuthContext';
 import { teamService, TeamUser } from '../services/teamService';
 import { Toaster, toast } from 'react-hot-toast';
+import CustomSelect from './CustomSelect';
 type Props = {
   open: boolean;
   onClose: () => void;
-  onCreated: (customerId: string) => void; // callback with new id (UUID)
+  onCreated: (customerId: string) => void; 
 };
 
 const NewCustomerModal: React.FC<Props> = ({ open, onClose, onCreated }) => {
@@ -23,7 +24,7 @@ const NewCustomerModal: React.FC<Props> = ({ open, onClose, onCreated }) => {
   const [country, setCountry] = useState('');
   const [sizeOfCompany, setSizeOfCompany] = useState('');
   const [note, setNote] = useState('');
-  // New fields on Customer
+ 
   const [industry, setIndustry] = useState('');
   const [website, setWebsite] = useState('');
   const [category, setCategory] = useState<'Enterprise' | 'SMB' | 'Individual' | 'SME' | ''>('');
@@ -33,7 +34,7 @@ const NewCustomerModal: React.FC<Props> = ({ open, onClose, onCreated }) => {
 
   const [loadingTeam, setLoadingTeam] = useState(false);
   const [saving, setSaving] = useState(false);
-  //const [err, setErr] = useState<string | null>(null);
+ 
 
   useEffect(() => {
     if (!open) return;
@@ -46,9 +47,9 @@ const NewCustomerModal: React.FC<Props> = ({ open, onClose, onCreated }) => {
         const team = await teamService.list(token);
         const users = team.users || [];
         setSalesmen(users);
-        // Set the current user as the default salesman
+        
         const me = users.find(u => String(u.id) === String(user?.id));
-      //  setSalesmanId(me?.id ? String(me.id) : (users.length ? String(users[0].id) : ''));
+    
       } catch {
          toast.error("Failed to load team members.");
       } finally {
@@ -71,7 +72,7 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
       return;
     }
     
-    // 1. New validation rule: Enforce Email or Contact Number
+   
     if (!email.trim() && !contactNumber.trim()) {
       toast.error('Please provide either an email or a contact number.');
       return;
@@ -117,7 +118,7 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
       onCreated(out.customerId);
       onClose();
 
-      // Reset fields (keep salesman for speed)
+      
       setCompanyName('');
       setContactNumber('');
       setEmail('');
@@ -174,7 +175,7 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
   >
     <div className="max-h-[65vh] overflow-y-auto pr-1 custom-scrollbar">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {/* Reusable input fields */}
+       
         {[
           {
             label: "Company Name*",
@@ -225,7 +226,7 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
           </div>
         ))}
 
-        {/* Industry */}
+       
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
             Industry
@@ -245,7 +246,7 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
           />
         </div>
 
-        {/* Website */}
+        
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
             Website
@@ -265,29 +266,23 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
           />
         </div>
 
-        {/* Category */}
+       
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
-            Category
-          </label>
-          <select
-            className="w-full rounded-lg px-3 py-2
-                       bg-white/70 dark:bg-midnight-800/60
-                       border border-cloud-300/40 dark:border-midnight-700/50
-                       text-midnight-800 dark:text-ivory-100
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/40
-                       transition-all duration-200"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">-- Select --</option>
-            <option value="Enterprise">Enterprise</option>
-            <option value="SMB">SMB</option>
-            <option value="Individual">Individual</option>
-          </select>
+          <CustomSelect
+  label="Category"
+  value={category}
+  onChange={setCategory}
+  options={[
+    { value: "", label: "-- Select --", isDisabled: true },
+    { value: "Enterprise", label: "Enterprise" },
+    { value: "SMB", label: "SMB" },
+    { value: "Individual", label: "Individual" }
+  ]}
+/>
+
         </div>
 
-        {/* Country */}
+       
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
             Country
@@ -304,64 +299,50 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
           />
         </div>
 
-        {/* Company Size */}
+       
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
-            Company Size
-          </label>
-          <select
-            className="w-full rounded-lg px-3 py-2
-                       bg-white/70 dark:bg-midnight-800/60
-                       border border-cloud-300/40 dark:border-midnight-700/50
-                       text-midnight-800 dark:text-ivory-100
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/40
-                       transition-all duration-200"
-            value={sizeOfCompany}
-            onChange={(e) => setSizeOfCompany(e.target.value)}
-          >
-            <option value="">-- Select --</option>
-            <option value="1-10">1-10</option>
-            <option value="11-50">11-50</option>
-            <option value="51-200">51-200</option>
-            <option value="201-500">201-500</option>
-            <option value="500+">500+</option>
-          </select>
+        <CustomSelect
+  label="Company Size"
+  value={sizeOfCompany}
+  onChange={setSizeOfCompany}
+  options={[
+    { value: "", label: "-- Select --", isDisabled: true },
+    { value: "1-10", label: "1-10" },
+    { value: "11-50", label: "11-50" },
+    { value: "51-200", label: "51-200" },
+    { value: "201-500", label: "201-500" },
+    { value: "500+", label: "500+" }
+  ]}
+/>
+
         </div>
 
-        {/* Salesman */}
+       
         <div>
-          <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
-            Salesman
-          </label>
+          
           {isAdmin ? (
             <>
-              <select
-                className="w-full rounded-lg px-3 py-2
-                           bg-white/70 dark:bg-midnight-800/60
-                           border border-cloud-300/40 dark:border-midnight-700/50
-                           text-midnight-800 dark:text-ivory-100
-                           focus:outline-none focus:ring-2 focus:ring-blue-400/40
-                           transition-all duration-200"
-                value={salesmanId}
-                onChange={(e) => setSalesmanId(e.target.value)}
-                disabled={loadingTeam}
-              >
-                <option value="" disabled>
-                  Select salesman
-                </option>
-                {salesmen.map((s) => (
-                  <option key={s.id} value={s.id} disabled={s.isBlocked}>
-                    {s.name}
-                    {s.isBlocked ? " (Blocked)" : ""}
-                  </option>
-                ))}
-              </select>
+              <CustomSelect
+    label="Salesman"
+    value={salesmanId}
+    onChange={setSalesmanId}
+    options={[
+      { value: "", label: "Select salesman", isDisabled: true },
+      ...salesmen.map((s) => ({
+        value: s.id,
+        label: s.name + (s.isBlocked ? " (Blocked)" : "")
+      }))
+    ]}
+  />
               <div className="text-xs text-gray-500 mt-1">
                 Admins must choose a salesman.
               </div>
             </>
           ) : (
             <>
+            <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
+            Salesman
+          </label>
               <input
                 className="w-full rounded-lg px-3 py-2
                            bg-gray-200/40 border border-cloud-300/40
@@ -384,7 +365,7 @@ const getErrorMessage = (error: any, defaultMessage: string): string => {
           )}
         </div>
 
-        {/* Note */}
+       
         <div className="sm:col-span-2 flex flex-col gap-1">
           <label className="text-sm font-semibold text-midnight-800/80 dark:text-ivory-200">
             Note

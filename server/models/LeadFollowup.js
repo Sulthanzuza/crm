@@ -1,4 +1,4 @@
-// models/LeadFollowup.js
+
 const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -26,7 +26,7 @@ LeadFollowup.init({
     type: DataTypes.DATE,
     allowNull: true
   },
-  // New field to store the reminder preference
+
   scheduleReminder: {
     type: DataTypes.ENUM('30m', '1hr', '3hr', '5hr', '7hr', '10hr', '12hr', '24hr'),
     allowNull: true,

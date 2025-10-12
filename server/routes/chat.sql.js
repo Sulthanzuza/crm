@@ -5,11 +5,7 @@ const ChatMessage = require('../models/ChatMessage');
 
 const router = express.Router();
 
-/**
- * Checks if the current user (req) can access and talk in the lead chat.
- * Admins have access to everything.
- * Members can access if they created the lead or are the assigned salesman.
- */
+
 async function canTalk(req, lead) {
   if (isAdmin(req)) return true;
 
@@ -20,10 +16,7 @@ async function canTalk(req, lead) {
   );
 }
 
-/**
- * GET /leads/:id/chat
- * Returns all chat messages for a lead if the user has access.
- */
+
 router.get('/leads/:id/chat', authenticateToken, async (req, res) => {
   try {
     const leadId = req.params.id;
@@ -38,17 +31,14 @@ router.get('/leads/:id/chat', authenticateToken, async (req, res) => {
       order: [['createdAt', 'ASC']],
     });
 
-    res.json({ success: true, messages }); // Returns raw DB objects; no change to field names
+    res.json({ success: true, messages }); 
   } catch (error) {
     console.error('Chat messages fetch error:', error);
     res.status(500).json({ success: false, message: 'server error' });
   }
 });
 
-/**
- * POST /leads/:id/chat
- * Creates a new chat message in the lead if the user has access.
- */
+
 router.post('/leads/:id/chat', authenticateToken, async (req, res) => {
   try {
     const leadId = req.params.id;
@@ -72,13 +62,13 @@ router.post('/leads/:id/chat', authenticateToken, async (req, res) => {
       attachments: Array.isArray(attachments) ? attachments : [],
     });
 
-    // Emit via Socket.io
+   
     const io = req.app.get('io');
     if (io) {
       io.to(`lead:${String(lead.id)}`).emit('chat:new', message);
     }
 
-    res.status(201).json({ success: true, message }); // Return created message unaltered
+    res.status(201).json({ success: true, message });
   } catch (error) {
     console.error('Chat message create error:', error);
     res.status(500).json({ success: false, message: 'server error' });

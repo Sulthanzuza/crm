@@ -9,13 +9,13 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import DataTable from '../components/DataTable';
 import AddContactModal from '../components/AddContactModal';
 import EditContactModal from '../components/EditContactModal';
-import { Filter } from '../components/FilterDropdown'; // Make sure this path is correct
+import { Filter } from '../components/FilterDropdown'; 
 import FormattedDateTime from '../components/FormattedDateTime';
 const Contacts: React.FC = () => {
     const { token, user } = useAuth();
     const isAdmin = user?.type === 'ADMIN';
 const navigate = useNavigate();
-    // State for the master (unfiltered) list and the displayed (filtered) list
+    
     const [masterRows, setMasterRows] = useState<ContactRow[]>([]);
     const [rows, setRows] = useState<ContactRow[]>([]);
     
@@ -23,7 +23,7 @@ const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
-    // Modals and selection states
+   
     const [isAddModalOpen, setAddModalOpen] = useState(false);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [editingContactId, setEditingContactId] = useState<string | null>(null);
@@ -33,7 +33,7 @@ const navigate = useNavigate();
 
     const selectedIds = useMemo(() => Object.keys(selected).filter((k) => selected[k]), [selected]);
 
-    // Initial data load
+    
     const load = async () => {
         if (!token) return;
         setLoading(true);
@@ -54,7 +54,7 @@ const navigate = useNavigate();
         load();
     }, [token]);
 
-    // Apply filters whenever the master list or filters change
+   
     useEffect(() => {
         let filtered = [...masterRows];
 
@@ -65,7 +65,6 @@ const navigate = useNavigate();
                     const value = 
                         key === 'Designation' ? contact.designation :
                         key === 'Department' ? contact.department :
-                        // key === 'Salesman' ? contact.Customer?.salesman?.name :
                         null;
                     return value && filter.values.includes(value);
                 });
@@ -75,14 +74,14 @@ const navigate = useNavigate();
         setRows(filtered);
     }, [appliedFilters, masterRows]);
 
-    // Generate filter options from the master list
+  
     const filterOptions = useMemo(() => ({
         Designation: [...new Set(masterRows.map(c => c.designation).filter(Boolean))],
         Department: [...new Set(masterRows.map(c => c.department).filter(Boolean))],
         ...(isAdmin && { Salesman: [...new Set(masterRows.map(c => c.customer?.salesman?.name).filter(Boolean))] }),
     }), [masterRows, isAdmin]);
 
-    // Handlers for modals and actions
+    
     const handleAddSuccess = () => { setAddModalOpen(false); load(); };
     const handleEditSuccess = () => { setEditModalOpen(false); setEditingContactId(null); load(); };
     const openEditModal = (contactId: string) => { setEditingContactId(contactId); setEditModalOpen(true); };
@@ -106,7 +105,7 @@ const navigate = useNavigate();
             <Sidebar />
             <div className="flex-1 overflow-y-auto h-screen">
                 <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                    {/* Header */}
+                  
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
                         <div>
                             <h1 className="text-2xl font-extrabold text-gray-900 dark:text-ivory-200">Contacts</h1>
@@ -181,7 +180,7 @@ const navigate = useNavigate();
                             filterKeys={['name', 'designation', 'department', 'email', 'mobile', 'customer.companyName', 'customer.salesman.name']}
                             initialSort={{ key: 'name', dir: 'ASC' }}
                             searchPlaceholder="Search contacts..."
-                            // Props to enable the filter dropdown
+                          
                             filterOptions={filterOptions}
                             appliedFilters={appliedFilters}
                             onApplyFilters={setAppliedFilters}

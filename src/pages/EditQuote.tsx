@@ -9,8 +9,7 @@ import { customerService } from '../services/customerService';
 import { toast } from 'react-hot-toast';
 import { teamService, TeamUser } from '../services/teamService';
 import PreviewModal from '../components/PreviewModal';
-
-// --- Type Definitions ---
+import CustomSelect from '../components/CustomSelect';
 type ItemState = {
   slNo: number;
   product: string;
@@ -21,7 +20,7 @@ type ItemState = {
   vatPercent: number;
 };
 
-// --- Helper for formatting dates ---
+
 const formatDateForInput = (dateString: string | Date): string => {
   if (!dateString) return '';
   try {
@@ -31,7 +30,7 @@ const formatDateForInput = (dateString: string | Date): string => {
   }
 };
 
-// CSS to hide number input spinners
+
 const noSpinnersCSS = `
   input[type='number']::-webkit-outer-spin-button,
   input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -44,7 +43,7 @@ const EditQuote: React.FC = () => {
   const { token, user } = useAuth();
   const isAdmin = user?.type === 'ADMIN';
 
-  // --- State Declarations ---
+
   const [salesmen, setSalesmen] = useState<TeamUser[]>([]);
   const [items, setItems] = useState<ItemState[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
@@ -76,7 +75,7 @@ const EditQuote: React.FC = () => {
 
   const today = new Date().toISOString().split('T')[0];
 
-  // --- Data Fetching ---
+ 
   useEffect(() => {
     if (!token) return;
     (async () => {
@@ -95,7 +94,6 @@ const EditQuote: React.FC = () => {
       setLoading(true);
       try {
         const { quote } = await quotesService.getOneById(quoteIdToEdit, token);
-        console.log(quote);
         
         setSelectedLeadId(quote.leadId);
         setCustomerName(quote.customerName || '');
@@ -146,7 +144,6 @@ const EditQuote: React.FC = () => {
     fetchAllData();
   }, [quoteIdToEdit, token, navigate]);
 
-  // --- Calculations ---
   const totals = useMemo(() => {
     let subtotal = 0, businessTotalCost = 0, totalVat = 0;
     for (const item of items) {
@@ -301,27 +298,44 @@ const EditQuote: React.FC = () => {
                 <div>
                   <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Salesman</label>
                   {isAdmin ? (
-                    <select value={salesmanId} className="w-full h-11 px-4 rounded-xl border" onChange={(e) => setSalesmanId(e.target.value)} required>
-                      <option value="" disabled>Select salesman</option>
-                      {salesmen.map((s) => (<option key={s.id} value={s.id} disabled={s.isBlocked}>{s.name}{s.isBlocked ? ' (Blocked)' : ''}</option>))}
-                    </select>
+                  <CustomSelect
+
+  value={salesmanId}
+  onChange={setSalesmanId}
+  options={[
+    { value: "", label: "Select salesman", isDisabled: true },
+    ...salesmen.map(s => ({
+      value: s.id,
+      label: s.name + (s.isBlocked ? " (Blocked)" : ""),
+      isDisabled: s.isBlocked
+    }))
+  ]}
+  placeholder="Select salesman"
+  required
+/>
                   ) : (
                     <input value={salesmen.find(s => s.id === salesmanId)?.name || ''} disabled className="w-full h-11 px-4 rounded-xl border bg-cloud-100/60 dark:bg-midnight-800/60" />
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Currency</label>
-                  <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="w-full h-11 px-4 rounded-xl border border-cloud-300/50 dark:border-midnight-600/50 bg-white/70 dark:bg-midnight-800/60 text-midnight-900 dark:text-ivory-100 shadow-sm" required>
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="INR">INR - Indian Rupee</option>
-                    <option value="SAR">SAR - Saudi Riyal</option>
-                    <option value="AED">AED - UAE Dirham</option>
-                    <option value="QAR">QAR - Qatari Riyal</option>
-                    <option value="KWD">KWD - Kuwaiti Dinar</option>
-                    <option value="BHD">BHD - Bahraini Dinar</option>
-                    <option value="OMR">OMR - Omani Rial</option>
-                  </select>
+                 <CustomSelect
+  label="Currency"
+  value={currency}
+  onChange={setCurrency}
+  options={[
+    { value: "USD", label: "USD - US Dollar" },
+    { value: "INR", label: "INR - Indian Rupee" },
+    { value: "SAR", label: "SAR - Saudi Riyal" },
+    { value: "AED", label: "AED - UAE Dirham" },
+    { value: "QAR", label: "QAR - Qatari Riyal" },
+    { value: "KWD", label: "KWD - Kuwaiti Dinar" },
+    { value: "BHD", label: "BHD - Bahraini Dinar" },
+    { value: "OMR", label: "OMR - Omani Rial" }
+  ]}
+  placeholder="Select currency"
+  required
+/>
                 </div>
 
                 {leadIsShared && (
@@ -344,11 +358,20 @@ const EditQuote: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-midnight-800 dark:text-ivory-200 mb-2">Contact Person</label>
-                    <select className="w-full h-11 px-4 rounded-xl border ..." value={contactId ?? ""} onChange={(e) => { const c = contacts.find(c => c.id === e.target.value); if (c) autofillContactFields(c); }}>
-                      <option value="" disabled>Select Contact</option>
-                      {contacts.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-                    </select>
+                  
+                    <CustomSelect
+  label="Contact Person"
+  value={contactId ?? ""}
+  onChange={val => {
+    const selectedContact = contacts.find(c => c.id === val);
+    if (selectedContact) autofillContactFields(selectedContact);
+  }}
+  options={[
+    { value: "", label: "Select Contact", isDisabled: true },
+    ...contacts.map(c => ({ value: c.id, label: c.name }))
+  ]}
+  placeholder="Select Contact"
+/>
                   </div>
 
                   <div>
@@ -435,15 +458,18 @@ const EditQuote: React.FC = () => {
                 {/* Discount Section */}
 
                 <div className="space-y-2 w-[30%]">
-                  <label className="block text-sm font-semibold text-midnight-800/90">Discount</label>
+                  <label className="block text-sm font-semibold text-midnight-800/90">Discount Mode</label>
                   <div className="flex items-center gap-3  rounded-xl ">
-                    <select className="w-1/2 h-10 rounded-lg px-2 
-                            bg-white/70 border border-cloud-400/50 
-                            text-sm text-midnight-700 
-                            focus:ring-2 focus:ring-sky-300/40 focus:border-sky-400
-                            outline-none transition-all" value={discountMode} onChange={(e) => setDiscountMode(e.target.value as "PERCENT" | "AMOUNT")}>
-                      <option value="PERCENT">Percent (%)</option><option value="AMOUNT">Amount</option>
-                    </select>
+                  <CustomSelect
+
+  value={discountMode}
+  onChange={val => setDiscountMode(val as "PERCENT" | "AMOUNT")}
+  options={[
+    { value: "PERCENT", label: "Percent" },
+    { value: "AMOUNT", label: "Amount" }
+  ]}
+  placeholder="Select Discount Mode"
+/>
                     <input type="number" min="0" className="flex-1 h-10 rounded-lg px-3
                           bg-white/70 border border-cloud-400/50 
                           text-sm text-midnight-700 

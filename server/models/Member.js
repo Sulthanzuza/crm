@@ -26,7 +26,7 @@ Member.init(
     tableName: 'members',
     timestamps: true,
 
-    // Define one named unique index instead
+    
     indexes: [
       { name: 'uniq_members_email', unique: true, fields: ['email'] },
     ],

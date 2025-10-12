@@ -5,9 +5,9 @@ import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
 import FormattedDateTime from '../components/FormattedDateTime';
-import EditContactModal from '../components/EditContactModal'; // <-- 1. Import the modal
+import EditContactModal from '../components/EditContactModal'; 
 
-// Helper component remains the same
+
 const DetailItem: React.FC<{ label: string; value: React.ReactNode | undefined | null }> = ({ label, value }) => {
   if (value === null || value === undefined || value === '') return null;
   return (
@@ -27,7 +27,7 @@ const CustomerContactDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   
-  // --- 2. State to manage the edit modal ---
+  
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   const loadContact = async () => {
@@ -49,10 +49,10 @@ const CustomerContactDetail: React.FC = () => {
     loadContact();
   }, [contactId, token]);
 
-  // Handler for when the modal reports a successful edit
+  
   const handleEditSuccess = () => {
     setEditModalOpen(false);
-    loadContact(); // Reload the contact details to show the updated information
+    loadContact(); 
   };
   
   if (authLoading || loading) {
@@ -135,7 +135,7 @@ const CustomerContactDetail: React.FC = () => {
         </main>
       </div>
 
-      {/* --- 4. Render the modal --- */}
+       
       <EditContactModal 
         open={isEditModalOpen}
         contactId={contactId}

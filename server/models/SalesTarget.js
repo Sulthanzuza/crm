@@ -22,7 +22,7 @@ SalesTarget.init({
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  month: { // 1 for January, 12 for December
+  month: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },

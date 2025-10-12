@@ -1,4 +1,4 @@
-// models/VendorContact.js
+
 const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../config/database');
 
@@ -29,12 +29,12 @@ VendorContact.init({
     type: DataTypes.STRING(50),
     allowNull: true
   },
-  // Foreign key for Vendor association
+  
   vendorId: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'vendors', // This is the table name
+      model: 'vendors', 
       key: 'id'
     }
   }

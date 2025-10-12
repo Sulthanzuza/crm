@@ -1,4 +1,4 @@
-// src/components/EditContactModal.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { contactsService, UpdateContactPayload } from '../services/contactsService';
@@ -71,14 +71,13 @@ const [companyName, setCompanyName] = useState('');
         return;
     }
 
-    // 2. Validate phone number format
-    // This regex allows an optional '+' at the start, followed by 7 to 15 digits.
+ 
     if (!/^\+?[0-9]{7,15}$/.test(form.mobile.trim())) {
         toast.error('Please enter a valid phone number (digits only, optional +).');
         return;
     }
 
-    // 3. Validate email format if an email is provided
+   
     if (form.email.trim() && !/^\S+@\S+\.\S+$/.test(form.email.trim())) {
         toast.error('Please provide a valid email address.');
         return;
@@ -88,8 +87,8 @@ const [companyName, setCompanyName] = useState('');
 
     try {
       await contactsService.update(contactId, form, token);
-      onSuccess(); // This will trigger a reload on the parent page
-      onClose(); // Close modal on success
+      onSuccess(); 
+      onClose(); 
     } catch (e: any) {
       toast.error(e?.data?.message || 'Failed to save changes.');
     } finally {
@@ -104,7 +103,7 @@ const [companyName, setCompanyName] = useState('');
       <div className="bg-white/50 dark:bg-midnight-900/40 backdrop-blur-xl border border-white/20 dark:border-midnight-700/30
                       w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
-        {/* Header */}
+        
         <div className="px-6 py-4 border-b border-white/20 dark:border-midnight-700/30 flex items-center justify-between">
           <h2 className="text-lg font-bold text-midnight-800 dark:text-ivory-100">Edit Contact</h2>
           <button
@@ -116,13 +115,13 @@ const [companyName, setCompanyName] = useState('');
           </button>
         </div>
 
-        {/* Form and Content Area */}
+        
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
           {loading ? (
             <div className="p-10 text-center text-midnight-700 dark:text-ivory-300">Loading...</div>
           ) : (
             <>
-              {/* Body */}
+            
               <div className="px-6 py-6 space-y-4 overflow-auto flex-1">
                
 
@@ -141,7 +140,7 @@ const [companyName, setCompanyName] = useState('');
                       />
                     </div>
 
-                    {/* Reusable Input Style */}
+                    
                     {[
                     
                       { key: 'name', label: 'Name*' },
@@ -174,7 +173,7 @@ const [companyName, setCompanyName] = useState('');
 
               </div>
 
-              {/* Footer */}
+            
               <div className="px-6 py-4 border-t border-white/20 dark:border-midnight-700/30 flex justify-end gap-4">
                 <Button
                   variant="secondary"

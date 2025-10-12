@@ -12,7 +12,7 @@ import AttachmentPreviewModal from '../components/AttachmentPreviewModal';
 import { toast } from 'react-hot-toast';
 import CustomSelect from '../components/CustomSelect';
 
-// Defines the structure of the main customer form
+
 type FormState = {
   companyName: string;
   contactNumber: string;
@@ -30,7 +30,6 @@ type FormState = {
 };
 
 
-// Initial state for a new customer form
 const initialForm: FormState = {
   companyName: '',
   contactNumber: '',
@@ -56,7 +55,6 @@ const EditCustomer: React.FC = () => {
   const { token, user } = useAuth();
   const isAdmin = user?.type === 'ADMIN';
   const MAX_ATTACHMENTS = 5;
-  // State for the main customer form
   const [form, setForm] = useState<FormState>(initialForm);
   const [salesmen, setSalesmen] = useState<TeamUser[]>([]);
   const [loading, setLoading] = useState(!isCreate);
@@ -66,7 +64,7 @@ const EditCustomer: React.FC = () => {
 const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
 const [deleteAttachmentDialogOpen, setDeleteAttachmentDialogOpen] = useState(false);
 
-  // State for attachments
+  
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
@@ -76,7 +74,7 @@ const [deleteAttachmentDialogOpen, setDeleteAttachmentDialogOpen] = useState(fal
 const [companySizeError, setCompanySizeError] = useState('');
 
 
-  // State for contacts management
+  
   const [showContacts, setShowContacts] = useState(false);
   const [contactForm, setContactForm] = useState({ name: '', designation: '', department: '', mobile: '', fax: '', email: '', social: '' });
   const [selectedContacts, setSelectedContacts] = useState<Record<string, boolean>>({});
@@ -86,7 +84,7 @@ const [companySizeError, setCompanySizeError] = useState('');
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
 
 
-  // Fetches all necessary data when the component mounts or ID changes
+  
   useEffect(() => {
     if (!token) return;
 
@@ -107,7 +105,6 @@ const [companySizeError, setCompanySizeError] = useState('');
   }, [id, token, isCreate, isAdmin, user?.id]);
 
 
-  // Function to load or reload customer data
   const loadCustomer = async () => {
     if (!id || !token) return;
     setLoading(true);
@@ -131,7 +128,7 @@ const [companySizeError, setCompanySizeError] = useState('');
         note: loadedCustomer.note || '',
       });
       setAttachments(loadedCustomer.attachments || []);
-      // *** FIX: Always set showContacts to true on the edit page ***
+   
       setShowContacts(true);
     } catch (e: any) {
       toast.error(e?.data?.message || 'Failed to load customer data.');
@@ -140,7 +137,7 @@ const [companySizeError, setCompanySizeError] = useState('');
     }
   };
   
-  // Handles form input changes
+  
   const onChange = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(p => ({ ...p, [key]: e.target.value }));
   };
@@ -163,7 +160,7 @@ const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUploadConfirmOpen(false);
     try {
       const res = await customerService.uploadAttachments(id, filesToUpload, token);
-      setAttachments(res.attachments); // Trust the server and replace the state
+      setAttachments(res.attachments); 
       toast.success('File(s) uploaded successfully!');
     } catch (err: any) {
       toast.error(err?.data?.message || 'Upload failed.');
@@ -192,7 +189,7 @@ const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 
   
-  // Saves the main customer form (handles both create and update)
+
   const saveCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.companyName) return toast.error('Company name is required.');
@@ -212,7 +209,7 @@ const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       if (isCreate) {
         const out = await customerService.create(form, token);
-        navigate(`/customers/${out.customerId}/edit`, { replace: true }); // No need for 'state' anymore
+        navigate(`/customers/${out.customerId}/edit`, { replace: true }); 
         toast.success('Customer created successfully!');
       } else {
         await customerService.update(id!, form, token);
@@ -226,7 +223,6 @@ const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     }
   };
   
-  // Adds a new contact person
   const addContact = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!id || !token || !contactForm.name) return toast.error('Contact name is required.');
@@ -250,7 +246,7 @@ const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
   const selectedIds = useMemo(() => Object.keys(selectedContacts).filter(k => selectedContacts[k]), [selectedContacts]);
 
 
-  // Deletes selected contacts in bulk
+
   const bulkDeleteContacts = async () => {
     if (!id || selectedIds.length === 0) return;
     setDeleting(true);

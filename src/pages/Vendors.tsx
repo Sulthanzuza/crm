@@ -1,4 +1,3 @@
-// src/pages/Vendors.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { Plus,Eye, Trash2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +33,7 @@ const Vendors: React.FC = () => {
     setLoading(true);
     try {
       const res = await vendorService.list(token, query);
-      console.log(res)
+    
       setRows(res.vendors);
     } catch (e: any) {
       setError(e?.data?.message || 'Failed to load vendors');
@@ -86,15 +85,7 @@ const Vendors: React.FC = () => {
               </p>
             </div>
             <div className="flex gap-2">
-              {/* <Button
-                variant="danger"
-                disabled={selectedIds.length === 0}
-                onClick={() => setConfirmOpen(true)}
-                className="flex items-center px-4 py-2 bg-red-200/50 dark:bg-red-800/50 backdrop-blur-md text-red-800 dark:text-ivory-300 hover:bg-red-300/70 dark:hover:bg-red-700/70 shadow-md rounded-xl transition"
-              >
-                <Trash2 size={18} className="mr-2" />
-                Delete Selected ({selectedIds.length})
-              </Button> */}
+             
               <Button
                 onClick={() => navigate('/vendors/new')}
                 className="flex items-center px-4 py-2 bg-cloud-200   text-midnight-700  hover:bg-blue-300 dark:hover:bg-midnight-600/70 shadow-md rounded-xl transition"
@@ -105,41 +96,7 @@ const Vendors: React.FC = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
-          {/* <form onSubmit={onSearch} className="mb-4 flex gap-2">
-            <input
-              className="flex-1 border rounded-lg px-3 py-2 bg-cloud-50/30 dark:bg-midnight-900/30 text-midnight-700 dark:text-ivory-300 placeholder-gray-500"
-              placeholder="Search vendors..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <select
-              className="border rounded-lg px-3 py-2 bg-cloud-50/30 dark:bg-midnight-900/30 text-midnight-700 dark:text-ivory-300"
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            >
-              <option value="">All Categories</option>
-              {(['Manufacturer', 'Distributor', 'ServiceProvider', 'Other'] as VendorCategory[]).map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-            <Button type="submit">Search</Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setSearch('');
-                setCategoryFilter('');
-                load();
-              }}
-            >
-              Reset
-            </Button>
-          </form> */}
-
-          {/* Status */}
+       
           {loading && (
             <div className="text-midnight-700 dark:text-ivory-300">Loading...</div>
           )}
@@ -150,20 +107,7 @@ const Vendors: React.FC = () => {
             <DataTable
               rows={rows}
               columns={[
-                // {
-                //   key: 'sel',
-                //   header: '',
-                //   width: '40px',
-                //   sortable: false,
-                //   render: (r: Vendor) => (
-                //     <input
-                //       type="checkbox"
-                //       className="h-4 w-4"
-                //       checked={!!selected[r.id]}
-                //       onChange={() => toggle(r.id)}
-                //     />
-                //   ),
-                // },
+              
                 {
                   key: 'vendorName',
                   header: 'Vendor',

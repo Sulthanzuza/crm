@@ -14,10 +14,10 @@ const authenticateToken = async (req, res, next) => {
     if (!payload || !payload.subjectType || !payload.subjectId) {
       return res.status(403).json({ success: false, message: 'Invalid token payload' });
     }
-    req.subjectType = payload.subjectType; // 'ADMIN' | 'MEMBER'
+    req.subjectType = payload.subjectType; 
     req.subjectId = payload.subjectId;
 
-    // Blocked check only for members
+   
     if (req.subjectType === 'MEMBER') {
       const m = await Member.findByPk(req.subjectId, { attributes: ['id','isBlocked'] });
       if (!m) return res.status(401).json({ success:false, message:'Account not found' });

@@ -15,8 +15,8 @@ const FORECASTS = ['Pipeline', 'BestCase', 'Commit'];
 
 const Leads: React.FC = () => {
     const navigate = useNavigate();
-    const { token, user } = useAuth(); // Get the user object
-    const isAdmin = user?.type === 'ADMIN'; // Check if the user is an admin
+    const { token, user } = useAuth(); 
+    const isAdmin = user?.type === 'ADMIN'; 
 
     const [leads, setLeads] = useState<Lead[]>([]);
     const [salesmen, setSalesmen] = useState<TeamUser[]>([]);
@@ -26,17 +26,17 @@ const Leads: React.FC = () => {
 
     const handleCreateLead = () => navigate('/leads/create');
 
-    // --- Conditionally build filter options based on user role ---
+    
     const filterOptions = {
         stage: STAGES,
         forecastCategory: FORECASTS,
 
     };
 
-    // Effect to fetch initial salesmen list (only needed for admins)
+  
     useEffect(() => {
         if (!token || !isAdmin) {
-            setSalesmen([]); // Clear salesmen if not admin
+            setSalesmen([]); 
             return;
         }
 
@@ -53,7 +53,7 @@ const Leads: React.FC = () => {
         loadSalesmen();
     }, [token, isAdmin]);
 
-    // Effect to fetch leads based on token and applied filters
+    
     useEffect(() => {
         if (!token) return;
 

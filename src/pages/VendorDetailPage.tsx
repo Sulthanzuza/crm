@@ -8,7 +8,6 @@ import DataTable from '../components/DataTable';
 import FormattedDateTime from '../components/FormattedDateTime';
 import { Pencil } from 'lucide-react';
 
-// Reusable DetailItem component for consistent display
 const DetailItem: React.FC<{ label: string; value: React.ReactNode | undefined | null }> = ({ label, value }) => {
   if (value === null || value === undefined || value === '') return null;
   return (
@@ -89,7 +88,7 @@ const VendorDetailPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Tab-like sections for details */}
+   
           <div className="space-y-8">
             {/* Basic & Business Info */}
             <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl p-6 shadow-lg">

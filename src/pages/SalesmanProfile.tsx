@@ -9,7 +9,7 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 
-// Reusable detail item component
+
 const DetailItem: React.FC<{ label: string; value?: string | null }> = ({ label, value }) => {
   if (!value) return null;
   return (

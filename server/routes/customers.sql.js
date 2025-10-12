@@ -12,7 +12,7 @@ const fs = require('fs')
 const { makeUploader } = require('../upload/uploader'); 
 const { v4: uuidv4 } = require('uuid');
 
-// Helper to add unique member id to customer's contactedBy array
+
 async function pushContactedBy(customer, memberId) {
   try {
     if (!memberId) return;
@@ -27,7 +27,7 @@ async function pushContactedBy(customer, memberId) {
   }
 }
 const { upload, toPublicUrl } = makeUploader('customers');
-// Helper: resolve member IDs to names for contactedBy
+
 async function resolveContactedByNames(ids) {
   if (!Array.isArray(ids) || ids.length === 0) return [];
   const uniqIds = [...new Set(ids.map(String))];
@@ -39,7 +39,7 @@ async function resolveContactedByNames(ids) {
   return uniqIds.map(id => idNameMap.get(id)).filter(Boolean);
 }
 
-// GET /customers - list customers with optional search
+
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const { search, Industry, Category, Salesman } = req.query;
@@ -49,10 +49,10 @@ router.get('/', authenticateToken, async (req, res) => {
         { model: CustomerContact, as: 'contacts' }
     ];
 
-    // --- General Search Filter ---
+    
     if (search) {
       const searchTerm = `%${String(search).trim()}%`;
-      // Use iLike for case-insensitive search in PostgreSQL
+      
       where[Op.or] = [
         { companyName: { [Op.iLike]: searchTerm } },
         { email: { [Op.iLike]: searchTerm } },
@@ -64,19 +64,19 @@ router.get('/', authenticateToken, async (req, res) => {
       ];
     }
 
-    // --- Dropdown Filters ---
+    
     if (Industry) where.industry = Industry;
     if (Category) where.category = Category;
     
-    // --- Role-Based Permissions & Salesman Filter ---
+    
     if (isAdmin(req)) {
-      // Admins can filter by salesman name
+      
       if (Salesman) {
         include[0].where = { name: Salesman };
-        include[0].required = true; // Makes it an INNER JOIN
+        include[0].required = true; 
       }
     } else {
-      // Non-admins can ONLY see their own assigned customers
+      
       where.salesmanId = req.subjectId;
     }
 
@@ -86,7 +86,7 @@ router.get('/', authenticateToken, async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
-    // --- Data Enrichment (same as your original code) ---
+   
     const result = await Promise.all(customers.map(async c => {
       const contactedBy = Array.isArray(c.contactedBy) ? c.contactedBy : [];
       const contactedByNames = await resolveContactedByNames(contactedBy);
@@ -194,7 +194,7 @@ router.post('/', authenticateToken, [
 
         await pushContactedBy(createdCustomer, resolvedSalesmanId);
 
-        // Your existing socket.io notification
+        
         notifyAdmins(req.app.get('io'), {
             event: 'CUSTOMER_CREATED',
             entityType: 'customer',
@@ -203,10 +203,9 @@ router.post('/', authenticateToken, [
             message: `Customer ${companyName} was created.`,
         });
 
-        // --- EMAIL NOTIFICATION LOGIC ---
-        // If an admin created this customer for another member, send an email.
+        
         if (isAdmin(req) && assignedSalesman) {
-            // Your existing in-app notification
+          
             await createNotification({
                 toType: 'MEMBER',
                 toId: resolvedSalesmanId,
@@ -217,7 +216,7 @@ router.post('/', authenticateToken, [
                 message: `Customer ${companyName} assigned to you.`,
             }, req.app.get('io'));
 
-            // **Send the email notification**
+            
             await notifyAssignment(assignedSalesman, 'Customer', createdCustomer);
         }
 
@@ -229,7 +228,7 @@ router.post('/', authenticateToken, [
     }
 });
 
-// --- UPDATED: Create New Contact for a Customer Route ---
+
 router.post('/:id/contacts', authenticateToken, [
     body('name').trim().notEmpty().withMessage('Name is required'),
 ], async (req, res) => {
@@ -251,10 +250,9 @@ router.post('/:id/contacts', authenticateToken, [
             customerId, name, designation, department, mobile, fax, email, social,
         });
 
-        // --- EMAIL NOTIFICATION LOGIC ---
-        // If an admin adds a contact to a customer assigned to a member, notify the member.
+        
         if (isAdmin(req) && customer.salesman && customer.salesmanId !== req.subjectId) {
-            // **Send the email notification**
+            
             await notifyAssignment(customer.salesman, 'Contact', newContact);
         }
 
@@ -266,7 +264,7 @@ router.post('/:id/contacts', authenticateToken, [
     }
 });
 
-// GET /customers/:id - get detail customer info
+
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const c = await Customer.findByPk(req.params.id, {
@@ -325,7 +323,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// PUT /customers/:id - update customer info
+
 router.put('/:id', authenticateToken, [
   body('companyName').optional().trim().notEmpty().withMessage('Company name cannot be empty'),
   body('salesmanId').optional().trim(),
@@ -348,8 +346,7 @@ router.put('/:id', authenticateToken, [
       note,
     } = req.body;
 
-    // --- SOLUTION ---
-    // Update fields, converting empty strings for ENUMs to null
+    
     if (companyName !== undefined) c.companyName = companyName;
     if (contactNumber !== undefined) c.contactNumber = contactNumber;
     if (email !== undefined) c.email = email;
@@ -360,14 +357,14 @@ router.put('/:id', authenticateToken, [
     if (sizeOfCompany !== undefined) c.sizeOfCompany = sizeOfCompany;
     if (status !== undefined) c.status = status;
     if (note !== undefined) c.note = note;
-    // Convert empty strings to null for ENUM columns
+    
     if (industry !== undefined) {
       c.industry = industry === '' ? null : industry;
     }
     if (category !== undefined) {
       c.category = category === '' ? null : category;
     }
-    // --- END SOLUTION ---
+    
 
     if (salesmanId !== undefined) {
       if (!isAdmin(req) && req.subjectId!==salesmanId)
@@ -430,7 +427,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// GET /customers/:id/contacts - list contacts for a customer
+
 router.get('/:id/contacts', authenticateToken, async (req, res) => {
   try {
     const customerId = req.params.id;
@@ -473,7 +470,7 @@ router.post(
       if (!customer) return res.status(404).json({ message: 'Customer not found' });
       if (!req.files) return res.status(400).json({ message: 'No files uploaded.' });
 
-      // --- FIX: Dynamically select the base URL ---
+      
       const baseUrl = process.env.NODE_ENV === 'production'
         ? process.env.VITE_PROD_SOCKET_URL
         : process.env.VITE_DEV_SOCKET_URL;
@@ -483,7 +480,7 @@ router.post(
         return {
           id: uuidv4(),
           name: file.originalname,
-          url: absoluteUrl, // The URL is now absolute and environment-specific
+          url: absoluteUrl, 
           path: file.path,
           size: file.size,
           mimeType: file.mimetype,
@@ -500,9 +497,7 @@ router.post(
     }
   }
 );
-// ===================================================================
-//  FINALIZED: Route to DELETE an attachment from a customer
-// ===================================================================
+
 router.delete(
   '/:id/attachments/:attachmentId',
   authenticateToken,
@@ -521,17 +516,17 @@ router.delete(
         return res.status(200).json({ success: true, message: 'Attachment already removed.' });
       }
 
-      // Safely attempt to delete the physical file
+      
       fs.unlink(attachmentToDelete.path, (err) => {
         if (err && err.code !== 'ENOENT') {
-          // Log any error other than "file not found"
+         
           console.error(`Failed to delete file from disk: ${attachmentToDelete.path}`, err);
         } else {
-          console.log(`File handled for deletion (or was already gone): ${attachmentToDelete.path}`);
+          
         }
       });
 
-      // Always remove the record from the database
+     
       customer.attachments = customer.attachments.filter(att => att.id !== attachmentId);
       await customer.save();
 
@@ -561,7 +556,7 @@ router.delete('/:id/contacts/:contactId', authenticateToken, async (req, res) =>
   }
 });
 
-// POST /customers/:id/contacts/bulk-delete - delete multiple contacts
+
 router.post('/:id/contacts/bulk-delete', authenticateToken, [
   body('contactIds').isArray({ min: 1 }).withMessage('Provide contactIds array'),
 ], async (req, res) => {
@@ -588,7 +583,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Not found' });
     }
 
-    // Delete all associated attachments from disk
+   
     if (customer.attachments && customer.attachments.length > 0) {
       customer.attachments.forEach(att => {
         fs.unlink(att.path, (err) => {

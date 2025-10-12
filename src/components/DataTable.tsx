@@ -27,10 +27,10 @@ type Props<Row extends Record<string, any>> = {
   filterOptions?: Record<string, string[]>;
   appliedFilters?: Filter[];
   onApplyFilters?: (filters: Filter[]) => void;
-  searchPlaceholder?: string; // New prop for custom placeholder
+  searchPlaceholder?: string; 
 };
 
-// Get nested value
+
 function getValueByPath(obj: any, path: string): any {
   if (!obj || !path) return undefined;
   const parts = path.split('.');
@@ -42,7 +42,7 @@ function getValueByPath(obj: any, path: string): any {
   return cur;
 }
 
-// Sorting function (dates > numbers > strings)
+
 function compareVals(a: any, b: any) {
   const da = Date.parse(a);
   const db = Date.parse(b);
@@ -66,7 +66,7 @@ const DataTable = <Row extends Record<string, any>>({
   filterOptions,
   appliedFilters,
   onApplyFilters,
-  searchPlaceholder, // Use the new prop
+  searchPlaceholder,
 }: Props<Row>) => {
   const [q, setQ] = useState('');
   const [sortKey, setSortKey] = useState<string | null>(initialSort?.key || null);
@@ -129,9 +129,9 @@ const DataTable = <Row extends Record<string, any>>({
 
   return (
     <div>
-      {/* --- Controls Section --- */}
+     
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        {/* Filter Dropdown */}
+       
         {filterOptions && appliedFilters && onApplyFilters && (
           <div className="flex-shrink-0">
             <FilterDropdown
@@ -141,7 +141,7 @@ const DataTable = <Row extends Record<string, any>>({
             />
           </div>
         )}
-        {/* Search Input */}
+       
         <div className="flex-grow flex justify-end">
           <input
             type="text"
@@ -153,7 +153,7 @@ const DataTable = <Row extends Record<string, any>>({
         </div>
       </div>
 
-      {/* Table */}
+
       <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -204,7 +204,7 @@ const DataTable = <Row extends Record<string, any>>({
           </table>
         </div>
 
-        {/* Pagination */}
+       
         <div className="px-4 py-3 bg-cloud-100/30 dark:bg-midnight-800/30 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-4 text-midnight-700 dark:text-ivory-300 select-none rounded-b-2xl">
           <div className="text-sm">
             Showing{" "}

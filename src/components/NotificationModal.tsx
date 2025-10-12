@@ -1,8 +1,8 @@
-// src/components/NotificationModal.tsx
+
 
 import React from 'react';
 import { X } from 'lucide-react';
-import { Notification } from '../services/notificationService'; // Assuming type export
+import { Notification } from '../services/notificationService'; 
 
 interface NotificationModalProps {
   isOpen: boolean;
@@ -30,7 +30,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
     >
       <div 
         className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col"
-        onClick={e => e.stopPropagation()} // Prevent modal from closing on inner click
+        onClick={e => e.stopPropagation()} 
       >
         <header className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold text-gray-800">Notifications</h2>

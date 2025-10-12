@@ -39,7 +39,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({ invoice, onStatusChange
   Overdue: 'bg-red-100 text-red-800',
 };
 
-  // Do not allow changes if invoice is Paid or Cancelled
+  
   if (invoice.status === 'Paid' || invoice.status === 'Cancelled') {
     return (
      <span className={`px-3 py-1 text-xs font-bold rounded-full ${statusStyles[invoice.status]}`}>

@@ -38,7 +38,7 @@ Lead.init(
     salesmanId: { type: DataTypes.UUID, allowNull: false },
     source: { type: DataTypes.STRING(80), defaultValue: 'Website' },
 
-    // ⚡ FIXED: removed `unique: true` here
+    
     uniqueNumber: { type: DataTypes.STRING(40), allowNull: false },
 closingDates: {
       type: DataTypes.JSON,

@@ -1,4 +1,4 @@
-// utils/seedAdmins.js
+
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/Admin');
 
@@ -6,7 +6,7 @@ async function seedAdmins() {
   if (!process.env.ADMIN_SEED_JSON) return;
   let entries = [];
   try {
-    entries = JSON.parse(process.env.ADMIN_SEED_JSON); // [{ name, email, password }, ...]
+    entries = JSON.parse(process.env.ADMIN_SEED_JSON); 
   } catch (e) {
     console.error('Invalid ADMIN_SEED_JSON:', e.message);
     return;

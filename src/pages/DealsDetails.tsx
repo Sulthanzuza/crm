@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import { useAuth } from '../contexts/AuthContext';
 import { dealsService, DealDetailsType } from '../services/dealsService';
 
-// Reusable component for displaying a label and its value
+
 const DetailItem: React.FC<{ label: string; value?: React.ReactNode }> = ({ label, value }) => (
   <div>
     <dt className="text-sm font-medium text-gray-500">{label}</dt>
@@ -12,7 +12,7 @@ const DetailItem: React.FC<{ label: string; value?: React.ReactNode }> = ({ labe
   </div>
 );
 
-// Reusable component for status badges
+
 const StatusBadge: React.FC<{ status?: string }> = ({ status }) => {
   if (!status) return null;
   const lowerStatus = status.toLowerCase();
@@ -45,7 +45,7 @@ const DealDetails: React.FC = () => {
   
   const quote = deal?.quote;
   const invoice = quote?.invoice;
-  const customer = deal?.customer; // Added for easier access
+  const customer = deal?.customer; 
 
   return (
     <div className="flex min-h-screen z-10 transition-colors duration-300">
@@ -73,7 +73,7 @@ const DealDetails: React.FC = () => {
                 </div>
               </div>
 
-              {/* Lead Information Card */}
+           
               <div className="bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl border border-cloud-300/30 dark:border-midnight-700/30 rounded-2xl p-5 shadow-lg mb-6">
                 <div className="text-base font-semibold text-midnight-700 dark:text-ivory-200 mb-3">
                   Lead Information

@@ -1,10 +1,7 @@
-// src/pages/CreateInvoicePage.tsx
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
-
-// --- Component & Service Imports ---
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
 import SelectContactModal from '../components/SelectContactModal';
@@ -26,7 +23,7 @@ const CreateInvoicePage: React.FC = () => {
     const [companyContacts, setCompanyContacts] = useState<Contact[]>([]);
     const [members, setMembers] = useState<TeamUser[]>([]);
 
-    // --- Form Fields for an INVOICE ---
+    
     const [customerName, setCustomerName] = useState('');
     const [address, setAddress] = useState('');
     const [contactPersonId, setContactPersonId] = useState('');
@@ -43,7 +40,7 @@ const CreateInvoicePage: React.FC = () => {
     const [items, setItems] = useState([{ product: '', description: '', quantity: 1, itemRate: 0, taxPercent: 5 }]);
     const [quoteId, setQuoteId] = useState<string | undefined>(undefined);
 
-    // --- Side Effects ---
+  
     useEffect(() => {
         if (user?.type === 'ADMIN' && token) {
             teamService.list(token).then(res => {
@@ -102,7 +99,7 @@ const CreateInvoicePage: React.FC = () => {
         );
     }, [location.state, token]);
 
-    // --- Event Handlers ---
+   
     const handleCompanySelect = (company: Company) => {
         setCompanyContacts([]);
         setContactPersonId('');
@@ -133,7 +130,7 @@ const CreateInvoicePage: React.FC = () => {
     const addItem = () => setItems([...items, { product: '', description: '', quantity: 1, itemRate: 0, taxPercent: 5 }]);
     const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index));
 
-    // --- Calculations ---
+    
     const { subtotal, vatAmount, grandTotal } = useMemo(() => {
         let calculatedSubtotal = 0;
         let calculatedVatAmount = 0;
@@ -146,11 +143,11 @@ const CreateInvoicePage: React.FC = () => {
         return { subtotal: calculatedSubtotal, vatAmount: calculatedVatAmount, grandTotal: grand };
     }, [items, discountAmount]);
 
-    // --- Form Submission ---
+   
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        // --- Comprehensive Validation ---
+    
         if (!token) {
             toast.error("Authentication error. Please log in again.");
             return;
@@ -217,7 +214,7 @@ const CreateInvoicePage: React.FC = () => {
                         description: item.description,
                         quantity: Number(item.quantity),
                         itemRate: Number(item.itemRate),
-                        taxPercent: Number(item.taxPercent), // Ensure tax is included per item
+                        taxPercent: Number(item.taxPercent), 
                     })),
                     notes,
                     quoteId,
@@ -245,7 +242,7 @@ const CreateInvoicePage: React.FC = () => {
         }
     };
 
-    // --- JSX Return ---
+
     return (
         <div className="flex min-h-screen z-10 transition-colors duration-300">
             <Sidebar />
@@ -258,7 +255,7 @@ const CreateInvoicePage: React.FC = () => {
                     <form onSubmit={handleSubmit} className="bg-white/30 dark:bg-midnight-900/40 backdrop-blur-xl border border-white/20 dark:border-midnight-700/30 p-8 rounded-xl shadow-2xl space-y-8">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-                            {/* Column 1: Bill To */}
+                           
                             <div>
                                 <label className="block text-sm font-bold text-midnight-700 dark:text-ivory-200 mb-2">Bill To</label>
                                 <div className="space-y-3">
@@ -268,20 +265,27 @@ const CreateInvoicePage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Column 2: Contact & Details */}
+                          
                             <div>
                                 <label className="block text-sm font-bold text-midnight-700 dark:text-ivory-200 mb-2">Contact & Details</label>
                                 <div className="space-y-4">
-                                    <select value={contactPersonId} onChange={e => handleContactPersonChange(e.target.value)} className="w-full h-12 px-3 rounded-xl border border-gray-300 dark:border-midnight-700/30 bg-white/40 dark:bg-midnight-800/50 text-midnight-800 dark:text-ivory-100 shadow-sm text-sm transition disabled:opacity-70" disabled={companyContacts.length === 0}>
-                                        <option value="">-- Select Contact --</option>
-                                        {companyContacts.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
-                                    </select>
+                                   <CustomSelect
+  value={contactPersonId}
+  onChange={handleContactPersonChange}
+  options={[
+    { value: "", label: "-- Select Contact --", isDisabled: companyContacts.length === 0 },
+    ...companyContacts.map(c => ({ value: c.id, label: c.name }))
+  ]}
+  placeholder="Select Contact"
+  isDisabled={companyContacts.length === 0}
+/>
+
                                     <input type="email" placeholder="Contact Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full h-12 px-3 rounded-xl border border-gray-300 dark:border-midnight-700/30 bg-white/40 dark:bg-midnight-800/50 text-midnight-800 dark:text-ivory-100 shadow-sm text-sm transition" />
                                     <input type="tel" placeholder="Contact Phone" value={phone} onChange={e => setPhone(e.target.value)} className="w-full h-12 px-3 rounded-xl border border-gray-300 dark:border-midnight-700/30 bg-white/40 dark:bg-midnight-800/50 text-midnight-800 dark:text-ivory-100 shadow-sm text-sm transition" />
                                 </div>
                             </div>
 
-                            {/* Column 3: Invoice Settings */}
+                           
                             <div className='col-span-2'>
                                 <label className="block text-sm font-bold text-midnight-700 dark:text-ivory-200 mb-2">Invoice Settings</label>
 
@@ -325,27 +329,23 @@ const CreateInvoicePage: React.FC = () => {
 
                                 <div className="grid grid-cols-2 gap-4 py-2">
                                     <div>
-                                        <label
-                                            htmlFor="currency"
-                                            className="block text-sm font-medium text-midnight-700 dark:text-ivory-200 mb-2"
-                                        >
-                                            Currency
-                                        </label>
-                                        <select
-                                            id="currency"
-                                            value={currency}
-                                            onChange={e => setCurrency(e.target.value)}
-                                            className="w-full h-10 px-3 rounded-xl border border-gray-300 dark:border-midnight-700/30 bg-white/40 dark:bg-midnight-800/50 text-midnight-800 dark:text-ivory-100 shadow-sm focus:border-sky-400 focus:ring focus:ring-sky-300/50 text-sm transition"
-                                        >
-                                            <option value="USD">USD - US Dollar</option>
-                                            <option value="INR">INR - Indian Rupee</option>
-                                            <option value="SAR">SAR - Saudi Riyal</option>
-                                            <option value="AED">AED - UAE Dirham</option>
-                                            <option value="QAR">QAR - Qatari Riyal</option>
-                                            <option value="KWD">KWD - Kuwaiti Dinar</option>
-                                            <option value="BHD">BHD - Bahraini Dinar</option>
-                                            <option value="OMR">OMR - Omani Rial</option>
-                                        </select>
+                                       <CustomSelect
+  label="Currency"
+  value={currency}
+  onChange={setCurrency}
+  options={[
+    { value: "USD", label: "USD - US Dollar" },
+    { value: "INR", label: "INR - Indian Rupee" },
+    { value: "SAR", label: "SAR - Saudi Riyal" },
+    { value: "AED", label: "AED - UAE Dirham" },
+    { value: "QAR", label: "QAR - Qatari Riyal" },
+    { value: "KWD", label: "KWD - Kuwaiti Dinar" },
+    { value: "BHD", label: "BHD - Bahraini Dinar" },
+    { value: "OMR", label: "OMR - Omani Rial" }
+  ]}
+  placeholder="Select Currency"
+/>
+
                                     </div>
 
                                     <div>

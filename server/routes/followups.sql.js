@@ -1,4 +1,4 @@
-// routes/leadFollowup.js
+
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken, isAdmin } = require('../middleware/auth');
@@ -18,7 +18,7 @@ async function canAccessLead(req, lead) {
         return true;
     }
     
-    // Check if the lead is shared with the current user
+    
     const share = await ShareGp.findOne({
         where: { leadId: lead.id, sharedMemberId: userId },
     });
@@ -81,16 +81,13 @@ async function writeLeadLog(req, leadId, action, message) {
   return logEntry;
 }
 
-/**
- * GET /:leadId
- * List all follow-ups for given lead if authorized.
- */
+
 router.get('/:leadId', authenticateToken, async (req, res) => {
     try {
         const lead = await Lead.findByPk(req.params.leadId);
         if (!lead) return res.status(404).json({ success: false, message: 'Not found' });
 
-        // UPDATED: Use the new async permission check
+        
         if (!(await canAccessLead(req, lead))) {
             return res.status(403).json({ success: false, message: 'Forbfghfidden' });
         }
@@ -110,10 +107,7 @@ router.get('/:leadId', authenticateToken, async (req, res) => {
     }
 });
 
-/**
- * POST /:leadId
- * Add a new follow-up for the lead if authorized.
- */
+
 router.post(
     '/:leadId',
     authenticateToken,
@@ -130,7 +124,7 @@ router.post(
         }
 
         try {
-            // UPDATED: Include creator, salesman, AND sharedWith
+           
             const lead = await Lead.findByPk(req.params.leadId, {
                 include: [
                     { model: Member, as: 'salesman' },
@@ -140,7 +134,7 @@ router.post(
             });
             if (!lead) return res.status(404).json({ success: false, message: 'Not found' });
 
-            // UPDATED: Use the new async permission check
+           
             if (!(await canAccessLead(req, lead))) {
                 return res.status(403).json({ success: false, message: 'Forbidden' });
             }
@@ -159,7 +153,7 @@ router.post(
             await writeLeadLog(req, lead.id, 'FOLLOWUP_ADDED', `${actorLabel(req)} added follow-up: ${status}`);
 
             if (newFollowup.scheduledAt) {
-                // CORRECTLY gathers all relevant recipients
+               
                 const recipients = new Set();
                 if (lead.salesman?.email) recipients.add(lead.salesman.email);
                 if (lead.creator?.email) recipients.add(lead.creator.email);

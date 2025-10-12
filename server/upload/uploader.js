@@ -1,9 +1,9 @@
-// src/upload/uploader.js (CommonJS to match current backend style)
+
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
-// ensure directory exists
+
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
@@ -41,9 +41,8 @@ function makeUploader(subdir = '') {
     },
   });
 
-  // helper to build a public URL from saved file path
   function toPublicUrl(savedPath) {
-    // expose under /uploads via express.static
+  
     const rel = path.relative(BASE_DIR, savedPath).replace(/\\/g, '/');
     return `/uploads/${rel}`;
   }

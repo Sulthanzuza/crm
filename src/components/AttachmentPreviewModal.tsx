@@ -14,7 +14,7 @@ interface Props {
   attachment: Attachment | null;
 }
 
-// Helper function to categorize file types for previewing
+
 const getPreviewType = (mimeType: string): 'image' | 'pdf' | 'excel' | 'other' => {
   if (['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(mimeType)) {
     return 'image';

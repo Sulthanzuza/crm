@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Eye, Download, Plus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-// Component Imports
 import Sidebar from '../components/Sidebar';
 import Button from '../components/Button';
 import DataTable from '../components/DataTable';
 import StatusDropdown from '../components/StatusDropdown';
 import PreviewModal from '../components/PreviewModal';
-import { Filter } from '../components/FilterDropdown'; // Ensure this path is correct
+import { Filter } from '../components/FilterDropdown'; 
 import FormattedDateTime from '../components/FormattedDateTime';
-// Service and Type Imports
 import { invoiceService, Invoice } from '../services/invoiceService';
 
 const customerTypeStyles: Record<string, string> = {
@@ -24,21 +22,19 @@ const InvoicesListPage: React.FC = () => {
     const isAdmin = user?.type === 'ADMIN';
     const navigate = useNavigate();
 
-    // State for master list (unfiltered) and displayed list (filtered)
+   
     const [masterInvoices, setMasterInvoices] = useState<Invoice[]>([]);
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     
     const [loading, setLoading] = useState(true);
   
     
-    // State for the filters
+    
     const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
-    // Other states
     const [preview, setPreview] = useState<{ open: boolean; html?: string }>({ open: false });
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-    // Initial data fetching
     useEffect(() => {
         if (!token) return;
         setLoading(true);
@@ -57,7 +53,7 @@ const InvoicesListPage: React.FC = () => {
             .finally(() => setLoading(false));
     }, [token]);
 
-    // Apply filters whenever the master list or the filters themselves change
+    
     useEffect(() => {
         let filtered = [...masterInvoices];
 
@@ -78,7 +74,7 @@ const InvoicesListPage: React.FC = () => {
         setInvoices(filtered);
     }, [appliedFilters, masterInvoices]);
 
-    // Generate filter options from the master list to ensure they are always available
+
     const filterOptions = useMemo(() => ({
         'Billed To': [...new Set(masterInvoices.map(inv => inv.customerName).filter(Boolean))],
         Status: [...new Set(masterInvoices.map(inv => inv.status).filter(Boolean))],

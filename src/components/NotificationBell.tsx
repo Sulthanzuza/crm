@@ -3,7 +3,7 @@ import { Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { notificationService, Notification } from '../services/notificationService';
 import { useSocket } from '../hooks/useSocket';
-import NotificationModal from './NotificationModal'; // Ensure this component is created
+import NotificationModal from './NotificationModal'; 
 
 const NotificationBell: React.FC = () => {
   const { token } = useAuth();
@@ -11,7 +11,7 @@ const NotificationBell: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- DATA LOADING ---
+  
   const loadNotifications = async () => {
     if (!token) return;
     try {
@@ -26,7 +26,7 @@ const NotificationBell: React.FC = () => {
     loadNotifications();
   }, [token]);
 
-  // Listen for real-time updates
+  
   useEffect(() => {
     if (!socket) return;
     const handler = (newNotification: Notification) => {
@@ -36,7 +36,7 @@ const NotificationBell: React.FC = () => {
     return () => { socket.off('notification:new', handler); };
   }, [socket]);
 
-  // --- ACTIONS ---
+  
   const handleMarkAsRead = async (id: string) => {
     if (!token) return;
     try {
@@ -63,13 +63,7 @@ const NotificationBell: React.FC = () => {
 
   return (
     <>
-      {/* 
-        This wrapper div now controls the fixed positioning.
-        - `fixed`: Positions the element relative to the viewport.
-        - `top-5`: Corresponds to a margin of 1.25rem (20px) from the top.
-        - `right-5`: Corresponds to a margin of 1.25rem (20px) from the right.
-        - `z-50`: Ensures it sits on top of other content.
-      */}
+      
       <div className="fixed top-5 right-5 z-50">
         <button 
           className="relative bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors" 

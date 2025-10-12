@@ -9,7 +9,7 @@ type ConfirmDialogProps = {
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  children?: React.ReactNode; // <-- FIX: Add children prop
+  children?: React.ReactNode; 
 };
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -20,7 +20,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   cancelText = 'Cancel',
   onConfirm,
   onCancel,
-  children, // <-- FIX: Destructure children from props
+  children, 
 }) => {
   if (!open) return null;
 
@@ -30,25 +30,25 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop */}
+     
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onCancel}
         aria-hidden="true"
       />
 
-      {/* Panel */}
+    
       <div className="relative w-full max-w-md rounded-2xl bg-cloud-50/30 dark:bg-midnight-900/30 backdrop-blur-xl border border-cloud-300/30 dark:border-midnight-700/30 shadow-xl">
-        {/* Header */}
+        
         <div className="px-6 py-4 border-b border-cloud-200/30 dark:border-midnight-700/40">
           <h2 className="text-lg font-semibold text-midnight-800 dark:text-ivory-100">
             {title}
           </h2>
         </div>
 
-        {/* Body */}
+       
         <div className="px-6 py-4">
-          {/* --- FIX: Render children if they exist, otherwise show the message --- */}
+        
           {children ? (
             <div>{children}</div>
           ) : (
@@ -56,7 +56,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           )}
         </div>
 
-        {/* Footer */}
+      
         <div className="px-6 py-4 border-t border-cloud-200/30 dark:border-midnight-700/40 flex justify-end gap-3">
           <Button
             type="button"
